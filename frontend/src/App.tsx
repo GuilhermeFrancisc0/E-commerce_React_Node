@@ -1,22 +1,17 @@
 import React from 'react';
 
-import { Box, ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 
-import TopBar from './components/TopBar';
+import NavigationBars from './components/NavigationBars';
 import Routes from './routes';
 import { theme } from './styles/theme';
 
-const App: React.FC = () => {
-  const [collapseSidebar, setCollapseSideBar] = React.useState(false);
-
-  return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <ThemeProvider theme={theme}>
-        <TopBar collapseSidebar={collapseSidebar} setCollapseSideBar={setCollapseSideBar} />
-        <Routes collapseSidebar={collapseSidebar} />
-      </ThemeProvider>
-    </Box>
-  );
-};
+const App: React.FC = () => (
+  <ThemeProvider theme={theme}>
+    <NavigationBars>
+      <Routes />
+    </NavigationBars>
+  </ThemeProvider>
+);
 
 export default App;
