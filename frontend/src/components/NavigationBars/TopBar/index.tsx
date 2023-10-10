@@ -7,41 +7,49 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
+import { useDisclose } from '../../../hooks/util';
+import Auth from '../../../pages/Auth';
+
 type Props = {
-  collapseSidebar: boolean;
-  setCollapseSideBar: (collapseSidebar: boolean) => void;
+  toggleSidebar: () => void;
 }
 
 export const TOPBAR_HEIGHT = 56;
 
-const TopBar: React.FC<Props> = ({ collapseSidebar, setCollapseSideBar }) => {
+const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
+  const authModal = useDisclose();
+
   return (
-    <AppBar sx={{ height: TOPBAR_HEIGHT }} position="static" color='primary'>
-      <Grid container>
-        <Grid item>
-          <IconButton
-            sx={{ m: 0, p: 2 }}
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={() => setCollapseSideBar(!collapseSidebar)}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Grid>
+    <>
+      <AppBar sx={{ height: TOPBAR_HEIGHT }} position="static" color='primary'>
+        <Grid container>
+          <Grid item>
+            <IconButton
+              sx={{ m: 0, p: 2 }}
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleSidebar}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Grid>
 
-        <Grid item display='flex' flexGrow={1} alignItems='center'>
-          <Typography variant="h6">
-            E-Commerce
-          </Typography>
-        </Grid>
+          <Grid item display='flex' flexGrow={1} alignItems='center'>
+            <Typography variant="h6">
+              E-Commerce
+            </Typography>
+          </Grid>
 
-        <Grid item display='flex' alignItems='center'>
-          <Button color="inherit">Login</Button>
+          <Grid item display='flex' alignItems='center'>
+            <Button color="inherit" onClick={authModal.onOpen}>Login</Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </AppBar>
+      </AppBar>
+
+      <Auth open={authModal.isOpen} onClose={authModal.onClose} />
+    </>
   );
 }
 
