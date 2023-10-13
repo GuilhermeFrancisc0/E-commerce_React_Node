@@ -1,13 +1,12 @@
 import * as React from 'react';
 
-import { ModalOwnProps } from '@mui/base/Modal/Modal.types';
-import Dialog from '@mui/material/Dialog';
+import Dialog, { DialogProps } from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 
 type Props = {
   title?: string;
   children: React.ReactNode;
-} & ModalOwnProps;
+} & DialogProps;
 
 const Modal: React.FC<Props> = ({ title, children, ...props }) => {
   return (

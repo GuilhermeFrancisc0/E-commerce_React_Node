@@ -17,7 +17,8 @@ type Props = {
 export const TOPBAR_HEIGHT = 56;
 
 const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
-  const authModal = useDisclose();
+
+  const signInModal = useDisclose();
 
   return (
     <>
@@ -43,12 +44,12 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
           </Grid>
 
           <Grid item display='flex' alignItems='center'>
-            <Button color="inherit" onClick={authModal.onOpen}>Login</Button>
+            <Button color="inherit" onClick={signInModal.onOpen}>Login</Button>
           </Grid>
         </Grid>
       </AppBar>
 
-      <Auth open={authModal.isOpen} onClose={authModal.onClose} />
+      <Auth signInModal={signInModal} />
     </>
   );
 }
