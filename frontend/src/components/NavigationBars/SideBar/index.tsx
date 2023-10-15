@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
-import { routes } from '../../../routes/routes';
+import { useAppSelector } from '../../../hooks';
+import { ROUTES } from '../../../routes/routes';
 import { TOPBAR_HEIGHT } from '../TopBar';
 
 type Props = {
@@ -15,9 +16,15 @@ const SIDEBAR_WIDTH = 180;
 const SIDEBAR_COLLAPSED_WIDTH = TOPBAR_HEIGHT;
 
 const SideBar: React.FC<Props> = ({ collapse }) => {
+  const { user } = useAppSelector(state => state.auth);
+
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
+
+  const routes = React.useMemo(() => {
+    return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user.permissions.includes(p)));
+  }, [user]);
 
   return (
     <Tabs
@@ -31,7 +38,7 @@ const SideBar: React.FC<Props> = ({ collapse }) => {
       orientation="vertical"
       TabIndicatorProps={{ sx: { width: '3px' } }}
       indicatorColor="primary"
-      value={pathname}
+      value={routes.find(r => r.path === pathname)?.path || '/'}
       onChange={(_, v: string) => navigate(v, { replace: true })}
     >
       {routes

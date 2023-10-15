@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Box, Grid } from '@mui/material';
 
+import { useDisclose } from '../../hooks/util';
 import SideBar from './SideBar';
 import TopBar, { TOPBAR_HEIGHT } from './TopBar';
 
@@ -10,15 +11,14 @@ type Props = {
 }
 
 const NavigationBars: React.FC<Props> = ({ children }) => {
-
-    const [collapseSidebar, setCollapseSideBar] = React.useState(false);
+    const sideBar = useDisclose();
 
     return (
         <Box sx={{ minHeight: '100vh' }}>
-            <TopBar collapseSidebar={collapseSidebar} setCollapseSideBar={setCollapseSideBar} />
+            <TopBar toggleSidebar={sideBar.onToggle} />
             <Grid container sx={{ minHeight: `calc(100vh - ${TOPBAR_HEIGHT}px)` }}>
                 <Grid item>
-                    <SideBar collapse={collapseSidebar} />
+                    <SideBar collapse={sideBar.isOpen} />
                 </Grid>
                 <Grid item sx={{ p: 2, flexGrow: 1 }}>
                     {children}
