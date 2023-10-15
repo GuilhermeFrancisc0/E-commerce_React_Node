@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 
-import { ForgetPasswordFormValues } from '../../../pages/Auth/ForgetPassword';
-import { SignInFormValues } from '../../../pages/Auth/SignIn';
-import { SignUpFormValues } from '../../../pages/Auth/SignUp';
+import {
+    ForgetPasswordFormValues, SignInFormValues, SignUpFormValues
+} from '../../../store/Auth/auth.type';
 
 export const signInSchema: yup.ObjectSchema<SignInFormValues> = yup.object({
     username: yup.string().required('Campo Obrigatório!'),

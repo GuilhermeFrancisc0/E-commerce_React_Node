@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useAppSelector } from '../../hooks';
 import { IUseDisclose, useDisclose } from '../../hooks/util';
 import ForgetPassword from './ForgetPassword';
 import SignIn from './SignIn';
@@ -10,9 +11,18 @@ type Props = {
 }
 
 const Auth: React.FC<Props> = ({ signInModal }) => {
+  const { user } = useAppSelector(state => state.auth);
 
   const signUpModal = useDisclose();
   const forgetPasswordModal = useDisclose();
+
+  React.useEffect(() => {
+    if (user.token) {
+      signInModal.onClose();
+      signUpModal.onClose();
+      forgetPasswordModal.onClose();
+    }
+  }, [user])
 
   return (
     <>

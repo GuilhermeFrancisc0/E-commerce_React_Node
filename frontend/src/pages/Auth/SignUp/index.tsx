@@ -1,22 +1,19 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Button, DialogContent, Grid, Typography } from '@mui/material';
+import { Button, CircularProgress, DialogContent, Grid, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 
 import TextInput from '../../../components/Inputs/TextInput';
 import Modal from '../../../components/Modal';
+import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { IUseDisclose, useDisclose } from '../../../hooks/util';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { signUpRequest } from '../../../store/Auth/auth.slice';
+import { SignUpFormValues } from '../../../store/Auth/auth.type';
 import { signUpSchema } from '../../../util/schemas/Auth';
-
-export type SignUpFormValues = {
-    email: string;
-    username: string;
-    password: string;
-}
 
 type Props = {
     modal: IUseDisclose;
@@ -24,10 +21,13 @@ type Props = {
 }
 
 const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
+    const dispatch = useAppDispatch();
+
+    const { signUp: { loading } } = useAppSelector(state => state.auth);
 
     const passwordInput = useDisclose();
 
-    const { control, handleSubmit } = useForm<SignUpFormValues>({
+    const form = useForm<SignUpFormValues>({
         defaultValues: {
             email: '',
             username: '',
@@ -36,15 +36,20 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
         resolver: yupResolver(signUpSchema)
     });
 
-
     const handleOpenSignInModal = () => {
-        modal.onClose();
-        openSignInModal();
+        if (!loading) {
+            modal.onClose();
+            openSignInModal();
+        }
     }
 
     const formSubmithandler = (values: SignUpFormValues) => {
-        console.log("SignUp", values)
+        dispatch(signUpRequest(values));
     }
+
+    React.useEffect(() => {
+        form.reset();
+    }, [modal.isOpen])
 
     return (
         <Modal maxWidth="xs" open={modal.isOpen} onClose={modal.onClose}>
@@ -58,22 +63,14 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
                     Sign Up
                 </Typography>
 
-                <form onSubmit={handleSubmit(formSubmithandler)}>
+                <FormProvider {...form}>
                     <Grid container gap={2}>
                         <Grid item xs={12}>
-                            <TextInput
-                                label='Email'
-                                name='email'
-                                control={control}
-                            />
+                            <TextInput label='Email' name='email' />
                         </Grid>
 
                         <Grid item xs={12}>
-                            <TextInput
-                                label='Usuário'
-                                name='username'
-                                control={control}
-                            />
+                            <TextInput label='Usuário' name='username' />
                         </Grid>
 
                         <Grid item xs={12}>
@@ -81,7 +78,6 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
                                 type={passwordInput.isOpen ? 'text' : 'password'}
                                 label='Senha'
                                 name='password'
-                                control={control}
                                 InputProps={{
                                     endAdornment:
                                         <IconButton color='primary' onClick={passwordInput.onToggle}>
@@ -92,7 +88,14 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Button type="submit" fullWidth variant="contained">Sign Up</Button>
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                onClick={form.handleSubmit(formSubmithandler)}
+                                disabled={loading}
+                            >
+                                {loading ? <CircularProgress size={24.5} /> : 'Sign Up'}
+                            </Button>
                         </Grid>
 
                         <Grid
@@ -112,7 +115,7 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
                             </Link>
                         </Grid>
                     </Grid>
-                </form>
+                </FormProvider>
             </DialogContent>
         </Modal>
     );

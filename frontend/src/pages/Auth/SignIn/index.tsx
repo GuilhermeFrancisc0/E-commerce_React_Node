@@ -1,21 +1,19 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Button, DialogContent, Grid, Typography } from '@mui/material';
+import { Button, CircularProgress, DialogContent, Grid, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 
 import TextInput from '../../../components/Inputs/TextInput';
 import Modal from '../../../components/Modal';
+import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { IUseDisclose, useDisclose } from '../../../hooks/util';
+import { signInRequest } from '../../../store/Auth/auth.slice';
+import { SignInFormValues } from '../../../store/Auth/auth.type';
 import { signInSchema } from '../../../util/schemas/Auth';
-
-export type SignInFormValues = {
-    username: string;
-    password: string;
-}
 
 type Props = {
     modal: IUseDisclose;
@@ -24,10 +22,13 @@ type Props = {
 }
 
 const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) => {
+    const dispatch = useAppDispatch();
+
+    const { signIn: { loading } } = useAppSelector(state => state.auth);
 
     const passwordInput = useDisclose();
 
-    const { control, handleSubmit } = useForm<SignInFormValues>({
+    const form = useForm<SignInFormValues>({
         defaultValues: {
             username: '',
             password: '',
@@ -36,18 +37,26 @@ const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) =>
     });
 
     const handleOpenForgetPasswordModal = () => {
-        modal.onClose();
-        forgetPasswordModal.onOpen();
+        if (!loading) {
+            modal.onClose();
+            forgetPasswordModal.onOpen();
+        }
     }
 
     const handleOpenSignUpModal = () => {
-        modal.onClose();
-        signUpModal.onOpen();
+        if (!loading) {
+            modal.onClose();
+            signUpModal.onOpen();
+        }
     }
 
     const formSubmithandler = (values: SignInFormValues) => {
-        console.log("SignIn", values)
+        dispatch(signInRequest(values));
     }
+
+    React.useEffect(() => {
+        form.reset();
+    }, [modal.isOpen])
 
     return (
         <Modal maxWidth="xs" open={modal.isOpen} onClose={modal.onClose}>
@@ -61,14 +70,13 @@ const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) =>
                     Sign in
                 </Typography>
 
-                <form onSubmit={handleSubmit(formSubmithandler)}>
+                <FormProvider {...form}>
                     <Grid container gap={2}>
                         <Grid item xs={12}>
                             <TextInput
                                 label='Usuário'
                                 name='username'
                                 placeholder='Digite seu Usuário'
-                                control={control}
                             />
                         </Grid>
 
@@ -78,7 +86,6 @@ const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) =>
                                 label='Senha'
                                 name='password'
                                 placeholder='Digite sua Senha'
-                                control={control}
                                 InputProps={{
                                     endAdornment:
                                         <IconButton color='primary' onClick={passwordInput.onToggle}>
@@ -103,7 +110,14 @@ const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) =>
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Button type='submit' fullWidth variant="contained">Sign in</Button>
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                onClick={form.handleSubmit(formSubmithandler)}
+                                disabled={loading}
+                            >
+                                {loading ? <CircularProgress size={24.5} /> : 'Sign In'}
+                            </Button>
                         </Grid>
 
                         <Grid
@@ -123,7 +137,7 @@ const SignIn: React.FC<Props> = ({ modal, signUpModal, forgetPasswordModal }) =>
                             </Link>
                         </Grid>
                     </Grid>
-                </form>
+                </FormProvider>
             </DialogContent>
         </Modal>
     );

@@ -1,18 +1,17 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, DialogContent, Grid, Typography } from '@mui/material';
+import { Button, CircularProgress, DialogContent, Grid, Typography } from '@mui/material';
 import Link from '@mui/material/Link';
 
 import TextInput from '../../../components/Inputs/TextInput';
 import Modal from '../../../components/Modal';
+import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { IUseDisclose } from '../../../hooks/util';
+import { forgetPasswordRequest } from '../../../store/Auth/auth.slice';
+import { ForgetPasswordFormValues } from '../../../store/Auth/auth.type';
 import { forgetPasswordSchema } from '../../../util/schemas/Auth';
-
-export type ForgetPasswordFormValues = {
-    email: string;
-}
 
 type Props = {
     modal: IUseDisclose;
@@ -20,8 +19,11 @@ type Props = {
 }
 
 const ForgetPassword: React.FC<Props> = ({ modal, openSignInModal }) => {
+    const dispatch = useAppDispatch();
 
-    const { control, handleSubmit } = useForm<ForgetPasswordFormValues>({
+    const { forgetPassword: { loading } } = useAppSelector(state => state.auth);
+
+    const form = useForm<ForgetPasswordFormValues>({
         defaultValues: {
             email: ''
         },
@@ -29,13 +31,19 @@ const ForgetPassword: React.FC<Props> = ({ modal, openSignInModal }) => {
     });
 
     const handleOpenSignInModal = () => {
-        modal.onClose();
-        openSignInModal();
+        if (!loading) {
+            modal.onClose();
+            openSignInModal();
+        }
     }
 
     const formSubmithandler = (values: ForgetPasswordFormValues) => {
-        console.log("ForgetPassword", values)
+        dispatch(forgetPasswordRequest(values));
     }
+
+    React.useEffect(() => {
+        form.reset();
+    }, [modal.isOpen])
 
     return (
         <Modal maxWidth="xs" open={modal.isOpen} onClose={modal.onClose}>
@@ -48,7 +56,7 @@ const ForgetPassword: React.FC<Props> = ({ modal, openSignInModal }) => {
                 >
                     Recuperação de Senha
                 </Typography>
-                <form onSubmit={handleSubmit(formSubmithandler)}>
+                <FormProvider {...form}>
                     <Grid container gap={2}>
                         <Grid item xs={12}>
                             <Typography
@@ -62,16 +70,18 @@ const ForgetPassword: React.FC<Props> = ({ modal, openSignInModal }) => {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <TextInput
-                                type='email'
-                                label='Email'
-                                name='email'
-                                control={control}
-                            />
+                            <TextInput type='email' label='Email' name='email' />
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Button type="submit" fullWidth variant="contained">Enviar</Button>
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                onClick={form.handleSubmit(formSubmithandler)}
+                                disabled={loading}
+                            >
+                                {loading ? <CircularProgress size={24.5} /> : 'Enviar'}
+                            </Button>
                         </Grid>
 
                         <Grid
@@ -91,7 +101,7 @@ const ForgetPassword: React.FC<Props> = ({ modal, openSignInModal }) => {
                             </Link>
                         </Grid>
                     </Grid>
-                </ form>
+                </ FormProvider>
             </DialogContent>
         </Modal>
     );
