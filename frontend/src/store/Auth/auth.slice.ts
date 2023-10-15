@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -28,43 +28,37 @@ const authSlice = createSlice({
     reducers: {
         signInRequest({ signIn }, _: PayloadAction<SignInFormValues>) {
             signIn.loading = true;
-            console.log('Slice-signInRequest');
         },
         signInSuccess(state, { payload }: PayloadAction<User>) {
             state.signIn.loading = false;
             state.user = payload;
-            console.log('Slice-signInSuccess', payload);
         },
-        signInFail({ signIn }, { payload }: PayloadAction<AxiosError>) {
+        signInFail({ signIn }, { payload }: PayloadAction<string>) {
             signIn.loading = false;
-            console.log('Slice-signInFail', payload.message);
+            toast.error(payload);
         },
 
         signUpRequest({ signUp }, _: PayloadAction<SignInFormValues>) {
             signUp.loading = true;
-            console.log('Slice-signUpRequest');
         },
         signUpSuccess(state, { payload }: PayloadAction<User>) {
             state.signUp.loading = false;
             state.user = payload;
-            console.log('Slice-signUpSuccess', payload);
         },
-        signUpFail({ signUp }, { payload }: PayloadAction<AxiosError>) {
+        signUpFail({ signUp }, { payload }: PayloadAction<string>) {
             signUp.loading = false;
-            console.log('Slice-signUpFail', payload.message);
+            toast.error(payload);
         },
 
         forgetPasswordRequest({ forgetPassword }, _: PayloadAction<ForgetPasswordFormValues>) {
             forgetPassword.loading = true;
-            console.log('Slice-forgetPasswordRequest');
         },
         forgetPasswordSuccess({ forgetPassword }) {
             forgetPassword.loading = false;
-            console.log('Slice-forgetPasswordSuccess');
         },
-        forgetPasswordFail({ forgetPassword }, { payload }: PayloadAction<AxiosError>) {
+        forgetPasswordFail({ forgetPassword }, { payload }: PayloadAction<string>) {
             forgetPassword.loading = false;
-            console.log('Slice-forgetPasswordFail', payload.message);
+            toast.error(payload);
         },
 
         signOut(state) {

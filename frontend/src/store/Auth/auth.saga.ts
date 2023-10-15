@@ -16,7 +16,7 @@ function* signIn({ payload }: PayloadAction<SignInFormValues>) {
 
         yield put(signInSuccess(data));
     } catch (e) {
-        yield put(signInFail(e as AxiosError));
+        yield put(signInFail((e as AxiosError).message));
     }
 }
 
@@ -26,7 +26,7 @@ function* signUp({ payload }: PayloadAction<SignUpFormValues>) {
 
         yield put(signUpSuccess(data));
     } catch (e) {
-        yield put(signUpFail(e as AxiosError));
+        yield put(signUpFail((e as AxiosError).message));
     }
 }
 
@@ -36,7 +36,7 @@ function* forgetPassword({ payload }: PayloadAction<ForgetPasswordFormValues>) {
 
         yield put(forgetPasswordSuccess());
     } catch (e) {
-        yield put(forgetPasswordFail(e as AxiosError));
+        yield put(forgetPasswordFail((e as AxiosError).message));
     }
 }
 
