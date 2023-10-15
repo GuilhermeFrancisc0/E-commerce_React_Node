@@ -1,4 +1,7 @@
+import './styles/toast.scss';
+
 import React from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import { ThemeProvider } from '@mui/material';
 
@@ -11,6 +14,7 @@ const App: React.FC = () => (
     <NavigationBars>
       <Routes />
     </NavigationBars>
+    <ToastContainer position="bottom-right" />
   </ThemeProvider>
 );
 
