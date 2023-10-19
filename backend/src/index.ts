@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import { corsOptions } from './config/corsOptions';
 import { errorHandler } from './middlewares/error';
 import { logger } from './middlewares/log';
+import Routes from './routes';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use(cors(corsOptions));
 app.use(morgan("dev"));
 
 app.use(express.json());
+
+app.use(Routes);
 
 app.use(errorHandler);
 
