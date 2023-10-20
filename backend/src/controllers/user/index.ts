@@ -1,8 +1,11 @@
+import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 
 import { User } from '../../models/user';
 
-const data = {
+const SALT_ROUNDS = 10;
+
+export const data = {
     users: [] as User[],
     setUsers: function (data: User[]) { this.users = data }
 }
@@ -11,7 +14,7 @@ export const getAll = (_: Request, res: Response) => {
     res.json(data.users);
 }
 
-export const create = (req: Request, res: Response) => {
+export const create = async (req: Request, res: Response) => {
     const { email, username, password }: User = req.body;
 
     if (!email || !username || !password)
@@ -23,11 +26,14 @@ export const create = (req: Request, res: Response) => {
     if (data.users.find(u => u.username === username))
         return res.status(400).json({ 'message': 'Usuário já Cadastrado no Sistema!' });
 
+    const salt = await bcrypt.genSalt(SALT_ROUNDS);
+    const encryptPassword = await bcrypt.hash(password, salt);
+
     const newUser: User = {
         id: data.users[data.users.length - 1]?.id + 1 || 1,
         email,
         username,
-        password,
+        password: encryptPassword,
         permissions: ['CLIENT'],
     };
 
