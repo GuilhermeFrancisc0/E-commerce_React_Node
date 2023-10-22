@@ -10,6 +10,4 @@ Routes.get("/user/:id", get);
 Routes.put("/user/:id", update);
 Routes.delete("/user/:id", remove);
 
-Routes.post("/auth", (req, res) => { });
-
 export default Routes;

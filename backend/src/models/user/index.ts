@@ -4,4 +4,5 @@ export type User = {
     username: string;
     password: string;
     permissions: ('ADMIN' | 'CLIENT')[];
+    refreshToken?: string;
 }
