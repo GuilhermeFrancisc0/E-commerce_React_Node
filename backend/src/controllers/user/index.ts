@@ -39,7 +39,7 @@ export const create = async (req: Request, res: Response) => {
 
     data.setUsers([...data.users, newUser]);
 
-    res.json(newUser);
+    res.sendStatus(201);
 }
 
 export const get = (req: Request, res: Response) => {

@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import { PayloadAction } from '@reduxjs/toolkit';
@@ -16,17 +16,17 @@ function* signIn({ payload }: PayloadAction<SignInFormValues>) {
 
         yield put(signInSuccess(data));
     } catch (e) {
-        yield put(signInFail((e as AxiosError).message));
+        yield put(signInFail());
     }
 }
 
 function* signUp({ payload }: PayloadAction<SignUpFormValues>) {
     try {
-        const { data }: AxiosResponse<User> = yield call(requestSignUp, payload);
+        yield call(requestSignUp, payload);
 
-        yield put(signUpSuccess(data));
+        yield put(signUpSuccess());
     } catch (e) {
-        yield put(signUpFail((e as AxiosError).message));
+        yield put(signUpFail());
     }
 }
 
@@ -36,7 +36,7 @@ function* forgetPassword({ payload }: PayloadAction<ForgetPasswordFormValues>) {
 
         yield put(forgetPasswordSuccess());
     } catch (e) {
-        yield put(forgetPasswordFail((e as AxiosError).message));
+        yield put(forgetPasswordFail());
     }
 }
 

@@ -5,7 +5,7 @@ export const requestSignIn = (payload: SignInFormValues) =>
     api.post<User>('/signIn', payload);
 
 export const requestSignUp = (payload: SignUpFormValues) =>
-    api.post<User>('/signUp', payload);
+    api.post('/user', payload);
 
 export const requestForgetPassword = (payload: ForgetPasswordFormValues) =>
     api.post('/forgetPassword', payload);

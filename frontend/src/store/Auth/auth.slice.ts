@@ -1,5 +1,3 @@
-import { toast } from 'react-toastify';
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { AuthState, ForgetPasswordFormValues, SignInFormValues, User } from './auth.type';
@@ -16,6 +14,7 @@ const initialState: AuthState = {
     },
     signUp: {
         loading: false,
+        success: false,
     },
     forgetPassword: {
         loading: false,
@@ -33,21 +32,21 @@ const authSlice = createSlice({
             state.signIn.loading = false;
             state.user = payload;
         },
-        signInFail({ signIn }, { payload }: PayloadAction<string>) {
+        signInFail({ signIn }) {
             signIn.loading = false;
-            toast.error(payload);
         },
 
         signUpRequest({ signUp }, _: PayloadAction<SignInFormValues>) {
             signUp.loading = true;
+            signUp.success = false;
         },
-        signUpSuccess(state, { payload }: PayloadAction<User>) {
-            state.signUp.loading = false;
-            state.user = payload;
-        },
-        signUpFail({ signUp }, { payload }: PayloadAction<string>) {
+        signUpSuccess({ signUp }) {
             signUp.loading = false;
-            toast.error(payload);
+            signUp.success = true;
+        },
+        signUpFail({ signUp }) {
+            signUp.loading = false;
+            signUp.success = false;
         },
 
         forgetPasswordRequest({ forgetPassword }, _: PayloadAction<ForgetPasswordFormValues>) {
@@ -56,9 +55,8 @@ const authSlice = createSlice({
         forgetPasswordSuccess({ forgetPassword }) {
             forgetPassword.loading = false;
         },
-        forgetPasswordFail({ forgetPassword }, { payload }: PayloadAction<string>) {
+        forgetPasswordFail({ forgetPassword }) {
             forgetPassword.loading = false;
-            toast.error(payload);
         },
 
         signOut(state) {
