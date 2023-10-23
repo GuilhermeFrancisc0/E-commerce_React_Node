@@ -5,7 +5,7 @@ import express from 'express';
 import morgan from 'morgan';
 
 import { corsOptions } from './config/corsOptions';
-import { verifyJWT } from './middlewares/auth';
+import { credentials, verifyJWT } from './middlewares/auth';
 import { errorHandler } from './middlewares/error';
 import { logger } from './middlewares/log';
 import Routes from './routes';
@@ -15,6 +15,8 @@ dotenv.config();
 const app = express();
 
 app.use(logger);
+
+app.use(credentials);
 
 app.use(cors(corsOptions));
 

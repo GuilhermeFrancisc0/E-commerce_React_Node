@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
+import { User } from '../../models/user';
 import { data } from '../user';
 
 export const signIn = async (req: Request, res: Response) => {
@@ -14,16 +15,23 @@ export const signIn = async (req: Request, res: Response) => {
     const passwordMatch = await bcrypt.compare(password, foundUser?.password || '');
 
     if (!foundUser || !passwordMatch)
-        return res.status(401).json({ 'message': '"Usuário" ou "Senha" incorretos!' });
+        return res.status(400).json({ 'message': '"Usuário" ou "Senha" incorretos!' });
+
+    const foundUserInfo: Omit<User, 'password' | 'refreshToken'> = {
+        id: foundUser.id,
+        email: foundUser.email,
+        username: foundUser.username,
+        permissions: foundUser.permissions,
+    }
 
     const accessToken = jwt.sign(
-        { 'username': foundUser.username },
+        foundUserInfo,
         process.env.ACCESS_TOKEN_SECRET || '',
         { expiresIn: '30s' }
     );
 
     const refreshToken = jwt.sign(
-        { 'username': foundUser.username },
+        foundUserInfo,
         process.env.REFRESH_TOKEN_SECRET || '',
         { expiresIn: '1d' }
     );
@@ -36,7 +44,12 @@ export const signIn = async (req: Request, res: Response) => {
         })
     );
 
-    res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie('jwt', refreshToken, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000
+    });
 
     res.json({ accessToken });
 }
@@ -52,7 +65,7 @@ export const signOut = async (req: Request, res: Response) => {
     const foundUser = data.users.find(u => u.refreshToken === refreshToken);
 
     if (!foundUser) {
-        res.clearCookie('jwt', { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
         return res.sendStatus(204);
     }
 
@@ -64,36 +77,41 @@ export const signOut = async (req: Request, res: Response) => {
         })
     );
 
-    res.clearCookie('jwt', { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
     res.sendStatus(204);
 }
 
 export const handleRefreshToken = (req: Request, res: Response) => {
     const { cookies } = req;
 
-    if (!cookies?.jwt)
-        return res.sendStatus(401);
+    try {
+        if (!cookies?.jwt)
+            throw new Error('Cookie JWT não Encontrado!');
 
-    const refreshToken = cookies.jwt;
-    console.log('handleRefreshToken-refreshToken', refreshToken);
+        const refreshToken = cookies.jwt;
 
-    const foundUser = data.users.find(u => u.refreshToken === refreshToken);
+        const foundUser = data.users.find(u => u.refreshToken === refreshToken);
 
-    if (!foundUser)
-        return res.sendStatus(403);
+        if (!foundUser)
+            throw new Error('Refresh Token não Encontrado!');
 
-    const user = jwt.verify(refreshToken, process.env.ACCESS_TOKEN_SECRET || '');
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || '');
 
-    console.log('handleRefreshToken-user', user)
+        const foundUserInfo: Omit<User, 'password' | 'refreshToken'> = {
+            id: foundUser.id,
+            email: foundUser.email,
+            username: foundUser.username,
+            permissions: foundUser.permissions,
+        }
 
-    if (!user)
-        return res.sendStatus(403);
+        const accessToken = jwt.sign(
+            foundUserInfo,
+            process.env.ACCESS_TOKEN_SECRET || '',
+            { expiresIn: '30s' }
+        );
 
-    const accessToken = jwt.sign(
-        { 'username': foundUser.username },
-        process.env.ACCESS_TOKEN_SECRET || '',
-        { expiresIn: '30s' }
-    );
-
-    res.json({ accessToken });
+        res.json({ accessToken });
+    } catch (e: any | Error) {
+        res.status(403).send({ message: e.message });
+    }
 }

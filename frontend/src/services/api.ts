@@ -1,15 +1,43 @@
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
+import { store } from '../store';
+import { updateAccessToken } from '../store/Auth/auth.slice';
+
 const { VITE_API_BASE_URL } = import.meta.env;
 
 const api = axios.create({
   baseURL: VITE_API_BASE_URL,
+  withCredentials: true
 });
+
+api.interceptors.request.use(request => {
+  const accessToken = localStorage.getItem('accessToken');
+  request.headers.authorization = `Bearer ${accessToken}`;
+
+  return Promise.resolve(request);
+})
 
 api.interceptors.response.use(
   response => response,
-  (error: AxiosError<{ message: string }>) => {
+  async (error: AxiosError<{ message: string }>) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401) {
+      try {
+        if (!originalRequest)
+          throw new Error('Original Request is Empty!');
+
+        const { data: { accessToken } } = await api.get('/refreshToken');
+
+        store.dispatch(updateAccessToken(accessToken));
+
+        originalRequest.headers.authorization = `Bearer ${accessToken}`;
+
+        return api(originalRequest);
+      } catch (e) { }
+    }
+
     toast.error(error.response?.data.message ?? error.message);
 
     return Promise.reject(error);

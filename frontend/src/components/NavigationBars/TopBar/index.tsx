@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { useDisclose } from '../../../hooks/util';
 import Auth from '../../../pages/Auth';
 import { signOut } from '../../../store/Auth/auth.slice';
+import { getUserByToken } from '../../../util/helpers/auth';
 
 type Props = {
   toggleSidebar: () => void;
@@ -21,7 +22,9 @@ export const TOPBAR_HEIGHT = 56;
 const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
   const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector(state => state.auth);
+  const { accessToken } = useAppSelector(state => state.auth);
+
+  const user = React.useMemo(getUserByToken, [accessToken]);
 
   const menu = useDisclose();
   const signInModal = useDisclose();
@@ -57,7 +60,7 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
           </Grid>
 
           <Grid item display='flex' alignItems='center'>
-            {!user.token ?
+            {!user ?
               <Button color="inherit" onClick={signInModal.onOpen}>Login</Button>
               :
               <>

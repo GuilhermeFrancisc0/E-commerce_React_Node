@@ -1,14 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { AuthState, ForgetPasswordFormValues, SignInFormValues, User } from './auth.type';
+import { AuthState, ForgetPasswordFormValues, SignInFormValues } from './auth.type';
 
 const initialState: AuthState = {
-    user: {
-        email: '',
-        username: '',
-        token: '',
-        permissions: [],
-    },
+    accessToken: '',
     signIn: {
         loading: false,
     },
@@ -28,9 +23,8 @@ const authSlice = createSlice({
         signInRequest({ signIn }, _: PayloadAction<SignInFormValues>) {
             signIn.loading = true;
         },
-        signInSuccess(state, { payload }: PayloadAction<User>) {
-            state.signIn.loading = false;
-            state.user = payload;
+        signInSuccess({ signIn }) {
+            signIn.loading = false;
         },
         signInFail({ signIn }) {
             signIn.loading = false;
@@ -59,8 +53,13 @@ const authSlice = createSlice({
             forgetPassword.loading = false;
         },
 
-        signOut(state) {
-            state.user = initialState.user;
+        signOut() {
+            // TODO: Ajustar rota de signOut
+        },
+
+        updateAccessToken(state, { payload }: PayloadAction<string>) {
+            state.accessToken = payload;
+            localStorage.setItem('accessToken', payload);
         }
     }
 })
@@ -76,6 +75,7 @@ export const {
     forgetPasswordSuccess,
     forgetPasswordFail,
     signOut,
+    updateAccessToken,
 } = authSlice.actions;
 
 export default authSlice.reducer;

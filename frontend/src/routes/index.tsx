@@ -2,13 +2,16 @@ import React from 'react';
 import { Navigate, Route, Routes as SwitchRoutes } from 'react-router-dom';
 
 import { useAppSelector } from '../hooks';
+import { getUserByToken } from '../util/helpers/auth';
 import { ROUTES } from './routes';
 
 const Routes: React.FC = () => {
-    const { user } = useAppSelector(state => state.auth);
+    const { accessToken } = useAppSelector(state => state.auth);
+
+    const user = React.useMemo(getUserByToken, [accessToken]);
 
     const routes = React.useMemo(() => {
-        return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user.permissions.includes(p)));
+        return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user?.permissions?.includes(p)));
     }, [user]);
 
     return (

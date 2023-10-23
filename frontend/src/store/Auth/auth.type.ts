@@ -1,7 +1,7 @@
 import { State } from '../../types/state';
 
 export type AuthState = {
-    user: User;
+    accessToken: string;
     signIn: State;
     signUp: State;
     forgetPassword: State;
@@ -10,9 +10,9 @@ export type AuthState = {
 export type Permissions = ('ADMIN' | 'CLIENT')[];
 
 export type User = {
-    username: string;
+    id: string | number;
     email: string;
-    token: string;
+    username: string;
     permissions: Permissions;
 }
 

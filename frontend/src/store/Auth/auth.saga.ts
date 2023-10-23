@@ -6,15 +6,17 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { requestForgetPassword, requestSignIn, requestSignUp } from './auth.service';
 import {
     forgetPasswordFail, forgetPasswordRequest, forgetPasswordSuccess, signInFail, signInRequest,
-    signInSuccess, signUpFail, signUpRequest, signUpSuccess
+    signInSuccess, signUpFail, signUpRequest, signUpSuccess, updateAccessToken
 } from './auth.slice';
-import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues, User } from './auth.type';
+import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues } from './auth.type';
 
 function* signIn({ payload }: PayloadAction<SignInFormValues>) {
     try {
-        const { data }: AxiosResponse<User> = yield call(requestSignIn, payload);
+        const { data: { accessToken } }: AxiosResponse<{ accessToken: string }> = yield call(requestSignIn, payload);
 
-        yield put(signInSuccess(data));
+        yield put(updateAccessToken(accessToken));
+
+        yield put(signInSuccess());
     } catch (e) {
         yield put(signInFail());
     }

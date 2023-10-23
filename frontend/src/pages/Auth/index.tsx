@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useAppSelector } from '../../hooks';
 import { IUseDisclose, useDisclose } from '../../hooks/util';
+import { getUserByToken } from '../../util/helpers/auth';
 import ForgetPassword from './ForgetPassword';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
@@ -11,13 +12,15 @@ type Props = {
 }
 
 const Auth: React.FC<Props> = ({ signInModal }) => {
-  const { user } = useAppSelector(state => state.auth);
+  const { accessToken } = useAppSelector(state => state.auth);
+
+  const user = React.useMemo(getUserByToken, [accessToken]);
 
   const signUpModal = useDisclose();
   const forgetPasswordModal = useDisclose();
 
   React.useEffect(() => {
-    if (user.token) {
+    if (user) {
       signInModal.onClose();
       signUpModal.onClose();
       forgetPasswordModal.onClose();

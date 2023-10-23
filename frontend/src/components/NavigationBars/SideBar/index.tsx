@@ -6,6 +6,7 @@ import Tabs from '@mui/material/Tabs';
 
 import { useAppSelector } from '../../../hooks';
 import { ROUTES } from '../../../routes/routes';
+import { getUserByToken } from '../../../util/helpers/auth';
 import { TOPBAR_HEIGHT } from '../TopBar';
 
 type Props = {
@@ -16,14 +17,16 @@ const SIDEBAR_WIDTH = 180;
 const SIDEBAR_COLLAPSED_WIDTH = TOPBAR_HEIGHT;
 
 const SideBar: React.FC<Props> = ({ collapse }) => {
-  const { user } = useAppSelector(state => state.auth);
+  const { accessToken } = useAppSelector(state => state.auth);
+
+  const user = React.useMemo(getUserByToken, [accessToken]);
 
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
 
   const routes = React.useMemo(() => {
-    return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user.permissions.includes(p)));
+    return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user?.permissions?.includes(p)));
   }, [user]);
 
   return (
