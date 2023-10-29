@@ -11,6 +11,9 @@ const initialState: AuthState = {
         loading: false,
         success: false,
     },
+    signOut: {
+        loading: false,
+    },
     forgetPassword: {
         loading: false,
     },
@@ -43,6 +46,18 @@ const authSlice = createSlice({
             signUp.success = false;
         },
 
+        signOutRequest({ signOut }) {
+            signOut.loading = true;
+        },
+        signOutSuccess(state) {
+            state.signOut.loading = false;
+            state.accessToken = '';
+            localStorage.removeItem('accessToken');
+        },
+        signOutFail({ signOut }) {
+            signOut.loading = false;
+        },
+
         forgetPasswordRequest({ forgetPassword }, _: PayloadAction<ForgetPasswordFormValues>) {
             forgetPassword.loading = true;
         },
@@ -51,10 +66,6 @@ const authSlice = createSlice({
         },
         forgetPasswordFail({ forgetPassword }) {
             forgetPassword.loading = false;
-        },
-
-        signOut() {
-            // TODO: Ajustar rota de signOut
         },
 
         updateAccessToken(state, { payload }: PayloadAction<string>) {
@@ -71,10 +82,12 @@ export const {
     signUpRequest,
     signUpSuccess,
     signUpFail,
+    signOutRequest,
+    signOutSuccess,
+    signOutFail,
     forgetPasswordRequest,
     forgetPasswordSuccess,
     forgetPasswordFail,
-    signOut,
     updateAccessToken,
 } = authSlice.actions;
 

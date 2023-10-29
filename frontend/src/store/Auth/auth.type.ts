@@ -4,6 +4,7 @@ export type AuthState = {
     accessToken: string;
     signIn: State;
     signUp: State;
+    signOut: State;
     forgetPassword: State;
 }
 

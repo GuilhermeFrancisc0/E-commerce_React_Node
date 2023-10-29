@@ -3,10 +3,13 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import { PayloadAction } from '@reduxjs/toolkit';
 
-import { requestForgetPassword, requestSignIn, requestSignUp } from './auth.service';
+import {
+    requestForgetPassword, requestSignIn, requestSignOut, requestSignUp
+} from './auth.service';
 import {
     forgetPasswordFail, forgetPasswordRequest, forgetPasswordSuccess, signInFail, signInRequest,
-    signInSuccess, signUpFail, signUpRequest, signUpSuccess, updateAccessToken
+    signInSuccess, signOutRequest, signOutSuccess, signUpFail, signUpRequest, signUpSuccess,
+    updateAccessToken
 } from './auth.slice';
 import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues } from './auth.type';
 
@@ -32,6 +35,16 @@ function* signUp({ payload }: PayloadAction<SignUpFormValues>) {
     }
 }
 
+function* signOut() {
+    try {
+        yield call(requestSignOut);
+
+        yield put(signOutSuccess());
+    } catch (e) {
+        yield put(signUpFail());
+    }
+}
+
 function* forgetPassword({ payload }: PayloadAction<ForgetPasswordFormValues>) {
     try {
         yield call(requestForgetPassword, payload);
@@ -45,5 +58,6 @@ function* forgetPassword({ payload }: PayloadAction<ForgetPasswordFormValues>) {
 export default all([
     takeLatest(signInRequest.type, signIn),
     takeLatest(signUpRequest.type, signUp),
+    takeLatest(signOutRequest.type, signOut),
     takeLatest(forgetPasswordRequest.type, forgetPassword),
 ]);

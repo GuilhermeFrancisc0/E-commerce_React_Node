@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { useDisclose } from '../../../hooks/util';
 import Auth from '../../../pages/Auth';
-import { signOut } from '../../../store/Auth/auth.slice';
+import { signOutRequest } from '../../../store/Auth/auth.slice';
 import { getUserByToken } from '../../../util/helpers/auth';
 
 type Props = {
@@ -33,7 +33,7 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
 
   const logout = () => {
     menu.onClose();
-    dispatch(signOut());
+    dispatch(signOutRequest());
   }
 
   return (
