@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { allowedOrigins } from '../../config/corsOptions';
+import { User } from '../../models/user';
 
 const publicPaths = [
     "/",
@@ -41,4 +42,28 @@ export const credentials = (req: Request, res: Response, next: NextFunction) => 
         res.header('Access-Control-Allow-Credentials', 'true');
 
     next();
+}
+
+export const verifyPermissions = (permissions: User['permissions']) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const { cookies } = req;
+
+        try {
+            if (!cookies?.jwt)
+                throw new Error('Cookie JWT não Encontrado!');
+
+            const refreshToken = cookies.jwt;
+
+            const user = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken'>;
+
+            const hasPermission = user.permissions.some(p => permissions.includes(p));
+
+            if (!hasPermission)
+                throw new Error('Usuário não tem Permissão para Acessar o Recurso!');
+
+            next();
+        } catch (e: any | Error) {
+            res.status(403).send({ message: e.message });
+        }
+    }
 }

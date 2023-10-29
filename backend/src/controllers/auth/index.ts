@@ -95,7 +95,10 @@ export const handleRefreshToken = (req: Request, res: Response) => {
         if (!foundUser)
             throw new Error('Refresh Token não Encontrado!');
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || '');
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || '', (e: any) => {
+            if (e)
+                throw new Error('Tempo de Acesso Expirado! Por favor Realize o Login Novamente.');
+        });
 
         const foundUserInfo: Omit<User, 'password' | 'refreshToken'> = {
             id: foundUser.id,
