@@ -1,5 +1,5 @@
 import api from '../../services/api';
-import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues } from './auth.type';
+import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues, User } from './auth.type';
 
 export const requestSignIn = (payload: SignInFormValues) =>
     api.post<{ accessToken: string }>('/signIn', payload);
@@ -12,3 +12,6 @@ export const requestSignOut = () =>
 
 export const requestForgetPassword = (payload: ForgetPasswordFormValues) =>
     api.post('/forgetPassword', payload);
+
+export const requestUserInfo = () =>
+    api.get<User>('/me');

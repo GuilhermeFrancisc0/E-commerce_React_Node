@@ -23,7 +23,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         if (!authorization)
-            throw new Error("Authorization not exists");
+            throw new Error("Autorização não existe!");
 
         const [, token] = authorization.split(" ");
 
@@ -53,6 +53,10 @@ export const verifyPermissions = (permissions: User['permissions']) => {
                 throw new Error('Cookie JWT não Encontrado!');
 
             const refreshToken = cookies.jwt;
+
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || '', (e: any) => {
+                if (e) throw new Error('Tempo de Acesso Expirado! Por favor Realize o Login Novamente.');
+            });
 
             const user = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken'>;
 

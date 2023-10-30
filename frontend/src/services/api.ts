@@ -1,9 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
-import { store } from '../store';
-import { updateAccessToken } from '../store/Auth/auth.slice';
-
 const { VITE_API_BASE_URL } = import.meta.env;
 
 const api = axios.create({
@@ -30,7 +27,7 @@ api.interceptors.response.use(
 
         const { data: { accessToken } } = await api.get('/refreshToken');
 
-        store.dispatch(updateAccessToken(accessToken));
+        localStorage.setItem('accessToken', accessToken);
 
         originalRequest.headers.authorization = `Bearer ${accessToken}`;
 

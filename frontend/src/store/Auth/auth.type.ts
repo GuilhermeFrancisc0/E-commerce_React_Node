@@ -1,7 +1,7 @@
 import { State } from '../../types/state';
 
 export type AuthState = {
-    accessToken: string;
+    userInfo: User & State;
     signIn: State;
     signUp: State;
     signOut: State;

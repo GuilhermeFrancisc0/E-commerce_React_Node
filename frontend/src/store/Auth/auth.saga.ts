@@ -4,20 +4,22 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 import {
-    requestForgetPassword, requestSignIn, requestSignOut, requestSignUp
+    requestForgetPassword, requestSignIn, requestSignOut, requestSignUp, requestUserInfo
 } from './auth.service';
 import {
     forgetPasswordFail, forgetPasswordRequest, forgetPasswordSuccess, signInFail, signInRequest,
     signInSuccess, signOutRequest, signOutSuccess, signUpFail, signUpRequest, signUpSuccess,
-    updateAccessToken
+    userInfoFail, userInfoRequest, userInfoSuccess
 } from './auth.slice';
-import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues } from './auth.type';
+import { ForgetPasswordFormValues, SignInFormValues, SignUpFormValues, User } from './auth.type';
 
 function* signIn({ payload }: PayloadAction<SignInFormValues>) {
     try {
         const { data: { accessToken } }: AxiosResponse<{ accessToken: string }> = yield call(requestSignIn, payload);
 
-        yield put(updateAccessToken(accessToken));
+        localStorage.setItem('accessToken', accessToken);
+
+        yield put(userInfoRequest());
 
         yield put(signInSuccess());
     } catch (e) {
@@ -55,9 +57,20 @@ function* forgetPassword({ payload }: PayloadAction<ForgetPasswordFormValues>) {
     }
 }
 
+function* userInfo() {
+    try {
+        const { data }: AxiosResponse<User> = yield call(requestUserInfo);
+
+        yield put(userInfoSuccess(data));
+    } catch (e) {
+        yield put(userInfoFail());
+    }
+}
+
 export default all([
     takeLatest(signInRequest.type, signIn),
     takeLatest(signUpRequest.type, signUp),
     takeLatest(signOutRequest.type, signOut),
     takeLatest(forgetPasswordRequest.type, forgetPassword),
+    takeLatest(userInfoRequest.type, userInfo),
 ]);

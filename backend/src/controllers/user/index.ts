@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 
 import { User } from '../../models/user';
 
@@ -93,4 +94,21 @@ export const update = (req: Request, res: Response) => {
     );
 
     res.json(data.users);
+}
+
+export const me = (req: Request, res: Response) => {
+    const { cookies } = req;
+
+    try {
+        if (!cookies?.jwt)
+            throw new Error('Cookie JWT não Encontrado!');
+
+        const refreshToken = cookies.jwt;
+
+        const user = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken'>;
+
+        res.json({ ...user });
+    } catch (e: any | Error) {
+        res.status(403).send({ message: e.message });
+    }
 }

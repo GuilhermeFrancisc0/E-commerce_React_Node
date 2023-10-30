@@ -1,9 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { AuthState, ForgetPasswordFormValues, SignInFormValues } from './auth.type';
+import { AuthState, ForgetPasswordFormValues, SignInFormValues, User } from './auth.type';
 
 const initialState: AuthState = {
-    accessToken: '',
+    userInfo: {
+        id: '',
+        email: '',
+        username: '',
+        permissions: [],
+        loading: false,
+    },
     signIn: {
         loading: false,
     },
@@ -51,7 +57,7 @@ const authSlice = createSlice({
         },
         signOutSuccess(state) {
             state.signOut.loading = false;
-            state.accessToken = '';
+            state.userInfo = initialState.userInfo;
             localStorage.removeItem('accessToken');
         },
         signOutFail({ signOut }) {
@@ -68,9 +74,14 @@ const authSlice = createSlice({
             forgetPassword.loading = false;
         },
 
-        updateAccessToken(state, { payload }: PayloadAction<string>) {
-            state.accessToken = payload;
-            localStorage.setItem('accessToken', payload);
+        userInfoRequest({ userInfo }) {
+            userInfo.loading = true;
+        },
+        userInfoSuccess(state, { payload }: PayloadAction<User>) {
+            state.userInfo = { ...payload, loading: false };
+        },
+        userInfoFail({ userInfo }) {
+            userInfo.loading = false;
         }
     }
 })
@@ -88,7 +99,9 @@ export const {
     forgetPasswordRequest,
     forgetPasswordSuccess,
     forgetPasswordFail,
-    updateAccessToken,
+    userInfoRequest,
+    userInfoSuccess,
+    userInfoFail,
 } = authSlice.actions;
 
 export default authSlice.reducer;

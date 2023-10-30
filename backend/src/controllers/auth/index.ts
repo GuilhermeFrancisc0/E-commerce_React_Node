@@ -51,7 +51,7 @@ export const signIn = async (req: Request, res: Response) => {
         maxAge: 24 * 60 * 60 * 1000
     });
 
-    res.json({ accessToken });
+    res.json({ accessToken  });
 }
 
 export const signOut = async (req: Request, res: Response) => {
