@@ -2,17 +2,14 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { User } from '../../models/user';
+import { User, UserModel } from '../../models/user';
 
 const SALT_ROUNDS = 10;
 
-export const data = {
-    users: [] as User[],
-    setUsers: function (data: User[]) { this.users = data }
-}
+export const getAll = async (_: Request, res: Response) => {
+    const users = await UserModel.find();
 
-export const getAll = (_: Request, res: Response) => {
-    res.json(data.users);
+    res.json(users);
 }
 
 export const create = async (req: Request, res: Response) => {
@@ -21,32 +18,32 @@ export const create = async (req: Request, res: Response) => {
     if (!email || !username || !password)
         return res.status(400).json({ 'message': 'Campos "Email", "Usuário" e "Senha" são obrigatórios!' });
 
-    if (data.users.find(u => u.email === email))
+    if (await UserModel.findOne({ email }))
         return res.status(400).json({ 'message': 'Email já Cadastrado no Sistema!' });
 
-    if (data.users.find(u => u.username === username))
+    if (await UserModel.findOne({ username }))
         return res.status(400).json({ 'message': 'Usuário já Cadastrado no Sistema!' });
 
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
     const encryptPassword = await bcrypt.hash(password, salt);
 
     const newUser: User = {
-        id: data.users[data.users.length - 1]?.id + 1 || 1,
         email,
         username,
         password: encryptPassword,
         permissions: ['CLIENT'],
+        refreshToken: ''
     };
 
-    data.setUsers([...data.users, newUser]);
+    await UserModel.create(newUser);
 
     res.sendStatus(201);
 }
 
-export const get = (req: Request, res: Response) => {
+export const get = async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const user = data.users.find(u => u.id === Number(id));
+    const user = await UserModel.findById(id);
 
     if (!user)
         return res.status(400).send({ 'message': 'Nenhum usuário encontrado!' });
@@ -54,46 +51,40 @@ export const get = (req: Request, res: Response) => {
     res.json(user);
 }
 
-export const remove = (req: Request, res: Response) => {
+export const remove = async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const userIdx = data.users.findIndex(u => u.id === Number(id));
+    const user = await UserModel.findById(id);
 
-    if (userIdx === -1)
+    if (!user)
         return res.status(400).send({ 'message': 'Nenhum usuário encontrado!' });
 
-    data.users.splice(userIdx, 1);
+    const users = await UserModel.findByIdAndDelete(id);
 
-    res.json(data.users);
+    res.json(users);
 }
 
-export const update = (req: Request, res: Response) => {
+export const update = async (req: Request, res: Response) => {
     const { id } = req.params;
     const body: User = req.body;
 
-    const userIdx = data.users.findIndex(u => u.id === Number(id));
+    const user = await UserModel.findById(id);
 
-    if (userIdx === -1)
+    if (!user)
         return res.status(400).send({ 'message': 'Nenhum usuário encontrado!' });
 
     if (!body.email || !body.username || !body.password)
         return res.status(400).json({ 'message': 'Campos "Email", "Usuário" e "Senha" são obrigatórios!' });
 
-    if (data.users.find(u => u.email === body.email))
+    if (await UserModel.findOne({ email: body.email }))
         return res.status(400).json({ 'message': 'Email já Cadastrado no Sistema!' });
 
-    if (data.users.find(u => u.username === body.username))
+    if (await UserModel.findOne({ username: body.username }))
         return res.status(400).json({ 'message': 'Usuário já Cadastrado no Sistema!' });
 
-    data.setUsers(
-        data.users.map(u => {
-            if (u.id === Number(id))
-                return { ...u, ...body };
-            return u;
-        })
-    );
+    const editedUser = await UserModel.findByIdAndUpdate(user._id, { ...body });
 
-    res.json(data.users);
+    res.json(editedUser);
 }
 
 export const me = (req: Request, res: Response) => {
@@ -107,7 +98,7 @@ export const me = (req: Request, res: Response) => {
 
         const user = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken'>;
 
-        res.json({ ...user });
+        res.json(user);
     } catch (e: any | Error) {
         res.status(403).send({ message: e.message });
     }

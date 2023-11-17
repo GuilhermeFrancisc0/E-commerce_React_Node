@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import mongoose from 'mongoose';
 import morgan from 'morgan';
 
 import { corsOptions } from './config/corsOptions';
@@ -11,6 +12,10 @@ import { logger } from './middlewares/log';
 import Routes from './routes';
 
 dotenv.config();
+
+mongoose.connect(process.env.MONGO_URL || '')
+    .then(con => console.log(`MongoDB conectado: ${con.connection.host}`))
+    .catch(e => console.log('MongoDB não conectado! Erro:', e));
 
 const app = express();
 

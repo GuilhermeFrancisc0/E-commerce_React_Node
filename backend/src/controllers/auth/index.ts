@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { User } from '../../models/user';
-import { data } from '../user';
+import { User, UserModel } from '../../models/user';
 
 export const signIn = async (req: Request, res: Response) => {
     const { username, password } = req.body;
@@ -11,14 +10,14 @@ export const signIn = async (req: Request, res: Response) => {
     if (!username || !password)
         return res.status(400).json({ 'message': 'Campos "Usuário" e "Senha" são obrigatórios!' });
 
-    const foundUser = data.users.find(u => u.username === username);
+    const foundUser = await UserModel.findOne({ username });
+
     const passwordMatch = await bcrypt.compare(password, foundUser?.password || '');
 
     if (!foundUser || !passwordMatch)
         return res.status(400).json({ 'message': '"Usuário" ou "Senha" incorretos!' });
 
     const foundUserInfo: Omit<User, 'password' | 'refreshToken'> = {
-        id: foundUser.id,
         email: foundUser.email,
         username: foundUser.username,
         permissions: foundUser.permissions,
@@ -36,13 +35,7 @@ export const signIn = async (req: Request, res: Response) => {
         { expiresIn: '1d' }
     );
 
-    data.setUsers(
-        data.users.map(u => {
-            if (u.id === foundUser.id)
-                return { ...u, refreshToken };
-            return u;
-        })
-    );
+    await UserModel.findByIdAndUpdate(foundUser._id, { refreshToken });
 
     res.cookie('jwt', refreshToken, {
         httpOnly: true,
@@ -51,7 +44,7 @@ export const signIn = async (req: Request, res: Response) => {
         maxAge: 24 * 60 * 60 * 1000
     });
 
-    res.json({ accessToken  });
+    res.json({ accessToken });
 }
 
 export const signOut = async (req: Request, res: Response) => {
@@ -62,26 +55,20 @@ export const signOut = async (req: Request, res: Response) => {
 
     const refreshToken = cookies.jwt;
 
-    const foundUser = data.users.find(u => u.refreshToken === refreshToken);
+    const foundUser = await UserModel.findOne({ refreshToken });
 
     if (!foundUser) {
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
         return res.sendStatus(204);
     }
 
-    data.setUsers(
-        data.users.map(u => {
-            if (u.id === foundUser.id)
-                return { ...u, refreshToken: '' };
-            return u;
-        })
-    );
+    await UserModel.findByIdAndUpdate(foundUser._id, { refreshToken: '' });
 
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
     res.sendStatus(204);
 }
 
-export const handleRefreshToken = (req: Request, res: Response) => {
+export const handleRefreshToken = async (req: Request, res: Response) => {
     const { cookies } = req;
 
     try {
@@ -90,7 +77,7 @@ export const handleRefreshToken = (req: Request, res: Response) => {
 
         const refreshToken = cookies.jwt;
 
-        const foundUser = data.users.find(u => u.refreshToken === refreshToken);
+        const foundUser = await UserModel.findOne({ refreshToken });
 
         if (!foundUser)
             throw new Error('Refresh Token não Encontrado!');
@@ -101,7 +88,6 @@ export const handleRefreshToken = (req: Request, res: Response) => {
         });
 
         const foundUserInfo: Omit<User, 'password' | 'refreshToken'> = {
-            id: foundUser.id,
             email: foundUser.email,
             username: foundUser.username,
             permissions: foundUser.permissions,

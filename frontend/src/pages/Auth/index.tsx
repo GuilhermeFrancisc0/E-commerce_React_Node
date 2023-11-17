@@ -17,7 +17,7 @@ const Auth: React.FC<Props> = ({ signInModal }) => {
   const forgetPasswordModal = useDisclose();
 
   React.useEffect(() => {
-    if (userInfo.id) {
+    if (userInfo.username) {
       signInModal.onClose();
       signUpModal.onClose();
       forgetPasswordModal.onClose();

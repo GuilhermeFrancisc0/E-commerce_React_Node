@@ -9,6 +9,7 @@ const publicPaths = [
     "/api/signIn",
     "/api/signOut",
     "/api/refreshToken",
+    "/api/forgetPassword",
 ];
 
 export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
