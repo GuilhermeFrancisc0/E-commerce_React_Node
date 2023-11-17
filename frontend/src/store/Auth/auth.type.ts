@@ -1,18 +1,19 @@
 import { State } from '../../types/state';
 
 export type AuthState = {
-    user: User;
+    userInfo: User & State;
     signIn: State;
     signUp: State;
+    signOut: State;
     forgetPassword: State;
 }
 
 export type Permissions = ('ADMIN' | 'CLIENT')[];
 
 export type User = {
-    username: string;
+    id: string | number;
     email: string;
-    token: string;
+    username: string;
     permissions: Permissions;
 }
 

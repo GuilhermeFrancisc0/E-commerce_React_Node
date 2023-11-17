@@ -16,15 +16,15 @@ const SIDEBAR_WIDTH = 180;
 const SIDEBAR_COLLAPSED_WIDTH = TOPBAR_HEIGHT;
 
 const SideBar: React.FC<Props> = ({ collapse }) => {
-  const { user } = useAppSelector(state => state.auth);
+  const { userInfo } = useAppSelector(state => state.auth);
 
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
 
   const routes = React.useMemo(() => {
-    return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user.permissions.includes(p)));
-  }, [user]);
+    return ROUTES.filter(r => !r.permissions || r.permissions.some(p => userInfo.permissions?.includes(p)));
+  }, [userInfo]);
 
   return (
     <Tabs

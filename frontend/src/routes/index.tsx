@@ -5,11 +5,11 @@ import { useAppSelector } from '../hooks';
 import { ROUTES } from './routes';
 
 const Routes: React.FC = () => {
-    const { user } = useAppSelector(state => state.auth);
+    const { userInfo } = useAppSelector(state => state.auth);
 
     const routes = React.useMemo(() => {
-        return ROUTES.filter(r => !r.permissions || r.permissions.some(p => user.permissions.includes(p)));
-    }, [user]);
+        return ROUTES.filter(r => !r.permissions || r.permissions.some(p => userInfo.permissions?.includes(p)));
+    }, [userInfo]);
 
     return (
         <SwitchRoutes>
