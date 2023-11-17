@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { useDisclose } from '../../../hooks/util';
 import Auth from '../../../pages/Auth';
-import { signOut } from '../../../store/Auth/auth.slice';
+import { signOutRequest, userInfoRequest } from '../../../store/Auth/auth.slice';
 
 type Props = {
   toggleSidebar: () => void;
@@ -21,7 +21,12 @@ export const TOPBAR_HEIGHT = 56;
 const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
   const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector(state => state.auth);
+  const { userInfo } = useAppSelector(state => state.auth);
+
+  React.useEffect(() => {
+    if (localStorage.getItem('accessToken'))
+      dispatch(userInfoRequest());
+  }, []);
 
   const menu = useDisclose();
   const signInModal = useDisclose();
@@ -30,7 +35,7 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
 
   const logout = () => {
     menu.onClose();
-    dispatch(signOut());
+    dispatch(signOutRequest());
   }
 
   return (
@@ -57,14 +62,14 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
           </Grid>
 
           <Grid item display='flex' alignItems='center'>
-            {!user.token ?
+            {!userInfo.username ?
               <Button color="inherit" onClick={signInModal.onOpen}>Login</Button>
               :
               <>
                 <Tooltip title="Abrir Configurações">
                   <IconButton ref={iconButtonRef} onClick={menu.onOpen} sx={{ paddingBlock: 0 }}>
                     <Avatar>
-                      {user.username.charAt(0).toUpperCase()}
+                      {userInfo.username.charAt(0).toUpperCase()}
                     </Avatar>
                   </IconButton>
                 </Tooltip>

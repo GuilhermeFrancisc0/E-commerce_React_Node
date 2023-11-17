@@ -11,18 +11,18 @@ type Props = {
 }
 
 const Auth: React.FC<Props> = ({ signInModal }) => {
-  const { user } = useAppSelector(state => state.auth);
+  const { userInfo } = useAppSelector(state => state.auth);
 
   const signUpModal = useDisclose();
   const forgetPasswordModal = useDisclose();
 
   React.useEffect(() => {
-    if (user.token) {
+    if (userInfo.username) {
       signInModal.onClose();
       signUpModal.onClose();
       forgetPasswordModal.onClose();
     }
-  }, [user])
+  }, [userInfo])
 
   return (
     <>

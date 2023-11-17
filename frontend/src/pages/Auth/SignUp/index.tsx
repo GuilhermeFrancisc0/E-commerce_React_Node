@@ -23,7 +23,7 @@ type Props = {
 const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
     const dispatch = useAppDispatch();
 
-    const { signUp: { loading } } = useAppSelector(state => state.auth);
+    const { signUp: { loading, success } } = useAppSelector(state => state.auth);
 
     const passwordInput = useDisclose();
 
@@ -50,6 +50,11 @@ const SignUp: React.FC<Props> = ({ modal, openSignInModal }) => {
     React.useEffect(() => {
         form.reset();
     }, [modal.isOpen])
+
+    React.useEffect(() => {
+        if (success)
+            handleOpenSignInModal();
+    }, [success])
 
     return (
         <Modal maxWidth="xs" open={modal.isOpen} onClose={modal.onClose}>

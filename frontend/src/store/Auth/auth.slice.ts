@@ -1,20 +1,23 @@
-import { toast } from 'react-toastify';
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { AuthState, ForgetPasswordFormValues, SignInFormValues, User } from './auth.type';
 
 const initialState: AuthState = {
-    user: {
+    userInfo: {
+        id: '',
         email: '',
         username: '',
-        token: '',
         permissions: [],
+        loading: false,
     },
     signIn: {
         loading: false,
     },
     signUp: {
+        loading: false,
+        success: false,
+    },
+    signOut: {
         loading: false,
     },
     forgetPassword: {
@@ -29,25 +32,36 @@ const authSlice = createSlice({
         signInRequest({ signIn }, _: PayloadAction<SignInFormValues>) {
             signIn.loading = true;
         },
-        signInSuccess(state, { payload }: PayloadAction<User>) {
-            state.signIn.loading = false;
-            state.user = payload;
-        },
-        signInFail({ signIn }, { payload }: PayloadAction<string>) {
+        signInSuccess({ signIn }) {
             signIn.loading = false;
-            toast.error(payload);
+        },
+        signInFail({ signIn }) {
+            signIn.loading = false;
         },
 
         signUpRequest({ signUp }, _: PayloadAction<SignInFormValues>) {
             signUp.loading = true;
+            signUp.success = false;
         },
-        signUpSuccess(state, { payload }: PayloadAction<User>) {
-            state.signUp.loading = false;
-            state.user = payload;
-        },
-        signUpFail({ signUp }, { payload }: PayloadAction<string>) {
+        signUpSuccess({ signUp }) {
             signUp.loading = false;
-            toast.error(payload);
+            signUp.success = true;
+        },
+        signUpFail({ signUp }) {
+            signUp.loading = false;
+            signUp.success = false;
+        },
+
+        signOutRequest({ signOut }) {
+            signOut.loading = true;
+        },
+        signOutSuccess(state) {
+            state.signOut.loading = false;
+            state.userInfo = initialState.userInfo;
+            localStorage.removeItem('accessToken');
+        },
+        signOutFail({ signOut }) {
+            signOut.loading = false;
         },
 
         forgetPasswordRequest({ forgetPassword }, _: PayloadAction<ForgetPasswordFormValues>) {
@@ -56,13 +70,18 @@ const authSlice = createSlice({
         forgetPasswordSuccess({ forgetPassword }) {
             forgetPassword.loading = false;
         },
-        forgetPasswordFail({ forgetPassword }, { payload }: PayloadAction<string>) {
+        forgetPasswordFail({ forgetPassword }) {
             forgetPassword.loading = false;
-            toast.error(payload);
         },
 
-        signOut(state) {
-            state.user = initialState.user;
+        userInfoRequest({ userInfo }) {
+            userInfo.loading = true;
+        },
+        userInfoSuccess(state, { payload }: PayloadAction<User>) {
+            state.userInfo = { ...payload, loading: false };
+        },
+        userInfoFail({ userInfo }) {
+            userInfo.loading = false;
         }
     }
 })
@@ -74,10 +93,15 @@ export const {
     signUpRequest,
     signUpSuccess,
     signUpFail,
+    signOutRequest,
+    signOutSuccess,
+    signOutFail,
     forgetPasswordRequest,
     forgetPasswordSuccess,
     forgetPasswordFail,
-    signOut,
+    userInfoRequest,
+    userInfoSuccess,
+    userInfoFail,
 } = authSlice.actions;
 
 export default authSlice.reducer;
