@@ -21,7 +21,7 @@ const NavigationBars: React.FC<Props> = ({ children }) => {
           <SideBar collapse={sideBar.isOpen} />
         </Box>
 
-        <Box padding={2}>
+        <Box padding={2} width='100%'>
           {children}
         </Box>
       </Box>

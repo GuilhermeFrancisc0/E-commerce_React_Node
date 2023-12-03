@@ -12,16 +12,24 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-type Props = {
-  name: string;
-  imgSrc: string;
-  rating: number;
-  price: number;
-  favorite: boolean;
-  editMode?: boolean;
-}
+import { Product } from '../../store/ProductsEdit/productsEdit.type';
 
-const ProductCard: React.FC<Props> = ({ name, imgSrc, rating, price, favorite, editMode }) => {
+type Props = {
+  editMode?: boolean;
+  handleEdit?: () => void;
+  handleRemove?: () => void;
+} & Product;
+
+const ProductCard: React.FC<Props> = ({
+  name,
+  imgSrc,
+  rating,
+  price,
+  favorite,
+  editMode,
+  handleEdit,
+  handleRemove,
+}) => {
   const [isFavorite, setIsFavorite] = useState(favorite);
 
   const handleFavorite = () => {
@@ -87,6 +95,7 @@ const ProductCard: React.FC<Props> = ({ name, imgSrc, rating, price, favorite, e
               variant='contained'
               size="small"
               endIcon={<EditIcon />}
+              onClick={handleEdit}
             >
               Editar
             </Button>
@@ -96,6 +105,7 @@ const ProductCard: React.FC<Props> = ({ name, imgSrc, rating, price, favorite, e
               variant='contained'
               size="small"
               endIcon={<DeleteIcon />}
+              onClick={handleRemove}
             >
               Excluir
             </Button>
