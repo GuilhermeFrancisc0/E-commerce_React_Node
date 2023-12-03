@@ -6,6 +6,7 @@ import StoreIcon from '@mui/icons-material/Store';
 
 import Home from '../pages/Home';
 import Products from '../pages/Products';
+import ProductsEdit from '../pages/ProductsEdit';
 import { Permissions } from '../store/Auth/auth.type';
 
 export interface IRoutes {
@@ -24,8 +25,8 @@ export const ROUTES: IRoutes[] = [
     tabIcon: <HomeIcon />,
   },
   {
-    component: <Products />,
-    path: '/productsEdit',
+    component: <ProductsEdit />,
+    path: '/products-edit',
     label: 'Produtos',
     tabIcon: <AddBusinessIcon />,
     permissions: ['ADMIN'],
