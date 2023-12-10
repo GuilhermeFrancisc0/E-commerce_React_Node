@@ -75,7 +75,7 @@ const ProductModal: React.FC<Props> = ({ modal, productToEdit }) => {
         >
             <DialogContent>
                 <FormProvider {...form}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} mt={1}>
                         <Grid item xs={12}>
                             <TextInput
                                 label='Nome'
@@ -123,7 +123,7 @@ const ProductModal: React.FC<Props> = ({ modal, productToEdit }) => {
                             />
                         </Grid>
 
-                        <Grid item xs={12} >
+                        <Grid item xs={12} mt={1}>
                             <Button
                                 variant="contained"
                                 fullWidth

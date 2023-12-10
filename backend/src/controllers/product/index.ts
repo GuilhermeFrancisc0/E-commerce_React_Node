@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import { Product, ProductModel } from '../../models/product';
-import { UserModel } from '../../models/user';
 
 export const list = async (req: Request, res: Response) => {
     try {
@@ -11,19 +10,20 @@ export const list = async (req: Request, res: Response) => {
 
         const list = await ProductModel
             .find(
-                // { name: { $regex: search, $options: "i" }, }
+            // $text
+            // { name: { $regex: search, $options: "i" }, }
             )
-            .sort({ id: 1 })
-            .limit((limit as number) * 1)
-            .skip(((page as number) - 1) * (limit as number))
+            .sort({ _id: -1 })
+            .limit(Number(limit))
+            .skip((Number(page)) * Number(limit))
             .exec();
 
         res.json({
-            data: list,
+            products: list,
             total: count,
-            limit,
+            limit: Number(limit),
             totalPages: Math.ceil(count / Number(limit)),
-            currentPage: Number(page),
+            page: Number(page),
         });
 
     } catch (e: any | Error) {
@@ -54,9 +54,9 @@ export const create = async (req: Request, res: Response) => {
             rating: 0,
         };
 
-        await ProductModel.create(newProduct);
+        const createdProduct = await ProductModel.create(newProduct);
 
-        res.sendStatus(201);
+        res.json(createdProduct);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }
@@ -86,9 +86,9 @@ export const remove = async (req: Request, res: Response) => {
         if (!product)
             return res.status(400).send({ 'message': 'Nenhum produto encontrado!' });
 
-        const products = await UserModel.findByIdAndDelete(id);
+        const removedProduct = await ProductModel.findByIdAndDelete(id);
 
-        res.json(products);
+        res.json(removedProduct);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }
@@ -110,13 +110,13 @@ export const update = async (req: Request, res: Response) => {
         if (body.price <= 0)
             return res.status(400).json({ 'message': 'Preço Precisa ser maior que 0!' });
 
-        if (await ProductModel.findOne({ name: body.name }))
+        if (await ProductModel.findOne({ name: body.name, _id: { $ne: body.id } }))
             return res.status(400).json({ 'message': 'Nome já Cadastrado no Sistema!' });
 
-        if (await ProductModel.findOne({ imgSrc: body.imgSrc }))
+        if (await ProductModel.findOne({ imgSrc: body.imgSrc, _id: { $ne: body.id } }))
             return res.status(400).json({ 'message': 'Imagem já Cadastrada no Sistema!' });
 
-        const editedProduct = await UserModel.findByIdAndUpdate(product._id, { ...body });
+        const editedProduct = await ProductModel.findByIdAndUpdate(product._id, { ...body }, { new: true });
 
         res.json(editedProduct);
     } catch (e: any | Error) {

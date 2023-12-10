@@ -6,10 +6,10 @@ import { verifyPermissions } from '../../middlewares/auth';
 
 const Routes = express.Router();
 
-Routes.get("/productEdit", verifyPermissions([Permissions.ADMIN]), list);
-Routes.post("/productEdit", verifyPermissions([Permissions.ADMIN]), create);
-Routes.get("/productEdit/:id", verifyPermissions([Permissions.ADMIN]), get);
-Routes.put("/productEdit/:id", verifyPermissions([Permissions.ADMIN]), update);
-Routes.delete("/productEdit/:id", verifyPermissions([Permissions.ADMIN]), remove);
+Routes.get("/productsEdit", verifyPermissions([Permissions.ADMIN]), list);
+Routes.post("/productsEdit", verifyPermissions([Permissions.ADMIN]), create);
+Routes.get("/productsEdit/:id", verifyPermissions([Permissions.ADMIN]), get);
+Routes.put("/productsEdit/:id", verifyPermissions([Permissions.ADMIN]), update);
+Routes.delete("/productsEdit/:id", verifyPermissions([Permissions.ADMIN]), remove);
 
 export default Routes;

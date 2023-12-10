@@ -1,11 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { Product, ProductFormValues, ProductsEditState } from './productsEdit.type';
+import {
+    Product,
+    ProductFormValues, ProductListParams, ProductListResponse, ProductsEditState
+} from './productsEdit.type';
 
 const initialState: ProductsEditState = {
-    products: [],
     list: {
         loading: false,
+        products: [],
+        total: 0,
+        limit: 0,
+        totalPages: 0,
+        page: 0,
     },
     create: {
         loading: false,
@@ -25,13 +32,17 @@ const productsEditSlice = createSlice({
     name: 'productsEdit',
     initialState,
     reducers: {
-        listRequest(state, { payload: page }: PayloadAction<number>) {
-            state.list.loading = true;
-            state.products = page ? [...state.products] : [];
+        listRequest({ list }, { payload: { page } }: PayloadAction<ProductListParams>) {
+            list.loading = true;
+            list.products = page ? [...list.products] : [];
         },
-        listSuccess(state, { payload }: PayloadAction<Product[]>) {
-            state.list.loading = false;
-            state.products = [...state.products, ...payload];
+        listSuccess({ list }, { payload }: PayloadAction<ProductListResponse>) {
+            list.loading = false;
+            list.products = [...list.products, ...payload.products];
+            list.page = payload.page;
+            list.limit = payload.limit;
+            list.total = payload.total;
+            list.totalPages = payload.totalPages;
         },
         listFail({ list }) {
             list.loading = false;
@@ -41,10 +52,10 @@ const productsEditSlice = createSlice({
             create.loading = true;
             create.success = false;
         },
-        createSuccess(state, { payload }: PayloadAction<ProductFormValues>) {
+        createSuccess(state, { payload }: PayloadAction<Product>) {
             state.create.loading = false;
             state.create.success = true;
-            state.products = [...state.products, { ...payload, id: Date.now().toString() }];
+            state.list.products = [...state.list.products, payload];
         },
         createFail({ create }) {
             create.loading = false;
@@ -58,7 +69,7 @@ const productsEditSlice = createSlice({
         editSuccess(state, { payload }: PayloadAction<ProductFormValues>) {
             state.edit.loading = false;
             state.edit.success = true;
-            state.products = [...state.products.map(p => p.id === payload.id ? payload : p)];
+            state.list.products = [...state.list.products.map(p => p.id === payload.id ? payload : p)];
         },
         editFail({ edit }) {
             edit.loading = false;
@@ -72,7 +83,7 @@ const productsEditSlice = createSlice({
         removeSuccess(state, { payload }: PayloadAction<string>) {
             state.remove.loading = false;
             state.remove.success = true;
-            state.products = [...state.products.filter(p => p.id !== payload)];
+            state.list.products = [...state.list.products.filter(p => p.id !== payload)];
         },
         removeFail({ remove }) {
             remove.loading = false;

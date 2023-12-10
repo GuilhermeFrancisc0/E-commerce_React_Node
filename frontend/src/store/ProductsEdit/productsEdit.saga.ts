@@ -8,13 +8,13 @@ import {
     createFail, createRequest, createSuccess, editFail, editRequest, editSuccess, listFail,
     listRequest, listSuccess, removeFail, removeRequest, removeSuccess
 } from './productsEdit.slice';
-import { Product, ProductFormValues } from './productsEdit.type';
+import { Product, ProductFormValues, ProductListParams, ProductListResponse } from './productsEdit.type';
 
-function* list({ payload: page }: PayloadAction<number>) {
+function* list({ payload: params }: PayloadAction<ProductListParams>) {
     try {
-        // const { data }: AxiosResponse<Product[]> = yield call(requestList, page);
+        const { data }: AxiosResponse<ProductListResponse> = yield call(requestList, params);
 
-        yield put(listSuccess([]));
+        yield put(listSuccess(data));
     } catch (e) {
         yield put(listFail());
     }
@@ -22,9 +22,9 @@ function* list({ payload: page }: PayloadAction<number>) {
 
 function* create({ payload }: PayloadAction<ProductFormValues>) {
     try {
-        // yield call(requestCreate, payload);
+        const { data }: AxiosResponse<Product> = yield call(requestCreate, payload);
 
-        yield put(createSuccess(payload));
+        yield put(createSuccess(data));
     } catch (e) {
         yield put(createFail());
     }
@@ -32,9 +32,9 @@ function* create({ payload }: PayloadAction<ProductFormValues>) {
 
 function* edit({ payload }: PayloadAction<ProductFormValues>) {
     try {
-        // yield call(requestEdit, payload);
+        const { data }: AxiosResponse<Product> = yield call(requestEdit, payload);
 
-        yield put(editSuccess(payload));
+        yield put(editSuccess(data));
     } catch (e) {
         yield put(editFail());
     }
@@ -42,7 +42,7 @@ function* edit({ payload }: PayloadAction<ProductFormValues>) {
 
 function* remove({ payload }: PayloadAction<string>) {
     try {
-        // yield call(requestRemove, payload);
+        yield call(requestRemove, payload);
 
         yield put(removeSuccess(payload));
     } catch (e) {

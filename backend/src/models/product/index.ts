@@ -22,7 +22,7 @@ const ProductSchema = new mongoose.Schema<Product>(
         rating: {
             type: Number,
             min: 0,
-            max: 0,
+            max: 5,
         },
         price: {
             type: Number,
@@ -32,6 +32,14 @@ const ProductSchema = new mongoose.Schema<Product>(
             type: Boolean,
         }
     },
+    {
+        toJSON: {
+            transform(_, ret) {
+                ret.id = ret._id
+                delete ret._id
+            }
+        }
+    }
 );
 
 export const ProductModel = mongoose.model("products", ProductSchema);
