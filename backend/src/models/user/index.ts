@@ -31,6 +31,14 @@ const UserSchema = new mongoose.Schema<User>(
         }],
         refreshToken: String,
     },
+    {
+        toJSON: {
+            transform(_, ret) {
+                ret.id = ret._id
+                delete ret._id
+            }
+        }
+    }
 );
 
 export const UserModel = mongoose.model("users", UserSchema);
