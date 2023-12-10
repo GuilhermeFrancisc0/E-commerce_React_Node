@@ -18,7 +18,7 @@ const ProductsEdit: React.FC = () => {
   const [productToEdit, setProductToEdit] = React.useState<Product | null>(null);
   const [productIdToRemove, setProductIdToRemove] = React.useState<string | null>(null);
 
-  const { products, create, edit, remove } = useAppSelector(state => state.productsEdit);
+  const { list } = useAppSelector(state => state.productsEdit);
 
   const productModal = useDisclose();
   const removeModal = useDisclose();
@@ -34,18 +34,18 @@ const ProductsEdit: React.FC = () => {
   }
 
   React.useEffect(() => {
-    dispatch(listRequest(0));
+    dispatch(listRequest({ page: 0, limit: 12 }));
   }, []);
 
   React.useEffect(() => {
-    if (create.success || edit.success || !productModal.isOpen)
+    if (!productModal.isOpen)
       setProductToEdit(null);
-  }, [create, edit, productModal.isOpen]);
+  }, [productModal.isOpen]);
 
   React.useEffect(() => {
-    if (remove.success || !removeModal.isOpen)
+    if (!removeModal.isOpen)
       setProductIdToRemove(null);
-  }, [remove, removeModal.isOpen]);
+  }, [removeModal.isOpen]);
 
   return (
     <>
@@ -54,7 +54,7 @@ const ProductsEdit: React.FC = () => {
           <Button variant='contained' onClick={productModal.onOpen}>Cadastrar Novo Produto</Button>
         </Grid>
         <Grid item container spacing={2} >
-          {products.map(product => (
+          {list.products.map(product => (
             <Grid key={product.id} item xl={2} lg={3} md={4} sm={6} xs={12}>
               <ProductCard
                 {...product}
