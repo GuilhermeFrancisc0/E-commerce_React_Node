@@ -1,9 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import {
-    Product,
-    ProductFormValues, ProductListParams, ProductListResponse, ProductsEditState
-} from './productsEdit.type';
+import { Product, ProductListParams, ProductListResponse } from '../Products/products.type';
+import { ProductFormValues, ProductsEditState } from './productsEdit.type';
 
 const initialState: ProductsEditState = {
     list: {

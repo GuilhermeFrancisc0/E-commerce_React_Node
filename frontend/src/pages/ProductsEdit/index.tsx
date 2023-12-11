@@ -7,8 +7,8 @@ import Button from '@mui/material/Button';
 import ProductCard from '../../components/ProductCard';
 import { useAppSelector } from '../../hooks';
 import { useDisclose } from '../../hooks/util';
+import { Product } from '../../store/Products/products.type';
 import { listRequest } from '../../store/ProductsEdit/productsEdit.slice';
-import { Product } from '../../store/ProductsEdit/productsEdit.type';
 import ProductModal from './ProductModal';
 import RemoveModal from './RemoveModal';
 
