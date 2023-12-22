@@ -3,12 +3,15 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import { PayloadAction } from '@reduxjs/toolkit';
 
-import { requestCreate, requestEdit, requestList, requestRemove } from './productsEdit.service';
+import { PAGINATION_LIMIT } from '../../constants';
+import { requestList } from '../Products/products.service';
+import { Product, ProductListParams, ProductListResponse } from '../Products/products.type';
+import { requestCreate, requestEdit, requestRemove } from './productsEdit.service';
 import {
     createFail, createRequest, createSuccess, editFail, editRequest, editSuccess, listFail,
     listRequest, listSuccess, removeFail, removeRequest, removeSuccess
 } from './productsEdit.slice';
-import { Product, ProductFormValues, ProductListParams, ProductListResponse } from './productsEdit.type';
+import { ProductFormValues } from './productsEdit.type';
 
 function* list({ payload: params }: PayloadAction<ProductListParams>) {
     try {
@@ -22,9 +25,11 @@ function* list({ payload: params }: PayloadAction<ProductListParams>) {
 
 function* create({ payload }: PayloadAction<ProductFormValues>) {
     try {
-        const { data }: AxiosResponse<Product> = yield call(requestCreate, payload);
+        yield call(requestCreate, payload);
 
-        yield put(createSuccess(data));
+        yield put(createSuccess());
+
+        yield put(listRequest({ page: 0, limit: PAGINATION_LIMIT }));
     } catch (e) {
         yield put(createFail());
     }

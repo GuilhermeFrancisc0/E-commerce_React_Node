@@ -8,8 +8,9 @@ import TextInput from '../../../components/Inputs/TextInput';
 import Modal from '../../../components/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { IUseDisclose } from '../../../hooks/util';
+import { Product } from '../../../store/Products/products.type';
 import { createRequest, editRequest } from '../../../store/ProductsEdit/productsEdit.slice';
-import { Product, ProductFormValues } from '../../../store/ProductsEdit/productsEdit.type';
+import { ProductFormValues } from '../../../store/ProductsEdit/productsEdit.type';
 import { createSchema } from '../../../util/schemas/ProductsEdit';
 
 type Props = {

@@ -12,7 +12,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-import { Product } from '../../store/ProductsEdit/productsEdit.type';
+import { Product } from '../../store/Products/products.type';
 
 type Props = {
   editMode?: boolean;
@@ -33,7 +33,7 @@ const ProductCard: React.FC<Props> = ({
   const [isFavorite, setIsFavorite] = useState(favorite);
 
   const handleFavorite = () => {
-    setIsFavorite(curr => !curr);
+    setIsFavorite((curr: boolean | undefined ) => !curr);
   }
 
   return (
