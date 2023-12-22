@@ -1,14 +1,11 @@
 import api from '../../services/api';
-import { ProductFormValues, Product, ProductListParams } from './productsEdit.type';
-
-export const requestList = (params: ProductListParams) =>
-    api.get<Product[]>('/productsEdit', { params });
+import { ProductFormValues } from './productsEdit.type';
 
 export const requestCreate = (payload: ProductFormValues) =>
-    api.post('/productsEdit', payload);
+    api.post('/products', payload);
 
 export const requestEdit = (payload: ProductFormValues) =>
-    api.put(`/productsEdit/${payload.id}`, payload);
+    api.put(`/products/${payload.id}`, payload);
 
 export const requestRemove = (productId: string) =>
-    api.delete(`/productsEdit/${productId}`);
+    api.delete(`/products/${productId}`);

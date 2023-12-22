@@ -1,4 +1,5 @@
 import { State } from '../../types/state';
+import { ProductListResponse } from '../Products/products.type';
 
 export type ProductsEditState = {
     list: ProductListResponse & State;
@@ -7,31 +8,9 @@ export type ProductsEditState = {
     remove: State;
 }
 
-export type Product = {
-    id?: string;
-    name: string;
-    imgSrc: string;
-    rating?: number;
-    price: number;
-    favorite?: boolean;
-}
-
 export type ProductFormValues = {
     id?: string;
     name: string;
     imgSrc: string;
     price: number;
-}
-
-export type ProductListParams = {
-    page: number;
-    limit: number;
-}
-
-export type ProductListResponse = {
-    products: Product[];
-    total: number;
-    limit: number;
-    totalPages: number;
-    page: number;
 }

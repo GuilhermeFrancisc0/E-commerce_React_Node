@@ -16,12 +16,12 @@ const NavigationBars: React.FC<Props> = ({ children }) => {
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#e7e7e7' }}>
       <TopBar toggleSidebar={sideBar.onToggle} />
-      <Box display='flex' sx={{ minHeight: `calc(100vh - ${TOPBAR_HEIGHT}px)` }}>
+      <Box display='flex' sx={{ height: `calc(100vh - ${TOPBAR_HEIGHT}px)` }}>
         <Box>
           <SideBar collapse={sideBar.isOpen} />
         </Box>
 
-        <Box padding={2} width='100%'>
+        <Box width='100%' height='100%'>
           {children}
         </Box>
       </Box>
