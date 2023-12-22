@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { Product, ProductListParams, ProductListResponse } from '../Products/products.type';
+import { ProductListParams, ProductListResponse } from '../Products/products.type';
 import { ProductFormValues, ProductsEditState } from './productsEdit.type';
 
 const initialState: ProductsEditState = {
@@ -50,10 +50,9 @@ const productsEditSlice = createSlice({
             create.loading = true;
             create.success = false;
         },
-        createSuccess(state, { payload }: PayloadAction<Product>) {
+        createSuccess(state) {
             state.create.loading = false;
             state.create.success = true;
-            state.list.products = [...state.list.products, payload];
         },
         createFail({ create }) {
             create.loading = false;
