@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 import { Product, ProductModel } from '../../models/product';
+import { User, UserModel } from '../../models/user';
 
 export const list = async (req: Request, res: Response) => {
     try {
@@ -12,7 +15,7 @@ export const list = async (req: Request, res: Response) => {
             .find(
             // $text
             // { name: { $regex: search, $options: "i" }, }
-            )
+        )
             .sort({ _id: -1 })
             .limit(Number(limit))
             .skip((Number(page)) * Number(limit))
@@ -119,6 +122,62 @@ export const update = async (req: Request, res: Response) => {
         const editedProduct = await ProductModel.findByIdAndUpdate(product._id, { ...body }, { new: true });
 
         res.json(editedProduct);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const getFavorites = async (req: Request, res: Response) => {
+    try {
+        const { cookies } = req;
+
+        if (!cookies?.jwt)
+            throw new Error('Cookie JWT não Encontrado!');
+
+        const refreshToken = cookies.jwt;
+
+        const { email } = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken' | 'favoriteProducts'>;
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user)
+            throw new Error('Usuário não Encontrado!');
+
+        res.json(user.favoriteProducts);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const favorite = async (req: Request, res: Response) => {
+    try {
+        const { params: { id }, cookies } = req;
+
+        const productId = id as any as mongoose.Types.ObjectId;
+
+        if (!cookies?.jwt)
+            throw new Error('Cookie JWT não Encontrado!');
+
+        const refreshToken = cookies.jwt;
+
+        const { email } = jwt.decode(refreshToken) as Omit<User, 'password' | 'refreshToken' | 'favoriteProducts'>;
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user)
+            throw new Error('Usuário não Encontrado!');
+
+        const isAlreadyFavorite = user.favoriteProducts?.some((fProductId) => fProductId.equals(productId));
+
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { email },
+            isAlreadyFavorite ?
+                { $pull: { favoriteProducts: productId } } :
+                { $addToSet: { favoriteProducts: productId } },
+            { new: true }
+        );
+
+        res.json(updatedUser?.favoriteProducts);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }

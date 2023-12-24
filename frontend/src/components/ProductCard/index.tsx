@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,9 +18,12 @@ type Props = {
   editMode?: boolean;
   handleEdit?: () => void;
   handleRemove?: () => void;
+  handleFavorite?: () => void;
+  favoriteLoading?: string | null;
 } & Product;
 
 const ProductCard: React.FC<Props> = ({
+  id,
   name,
   imgSrc,
   rating,
@@ -29,12 +32,9 @@ const ProductCard: React.FC<Props> = ({
   editMode,
   handleEdit,
   handleRemove,
+  handleFavorite,
+  favoriteLoading,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(favorite);
-
-  const handleFavorite = () => {
-    setIsFavorite((curr: boolean | undefined ) => !curr);
-  }
 
   return (
     <Card sx={{
@@ -44,7 +44,7 @@ const ProductCard: React.FC<Props> = ({
       '&:hover': { boxShadow: 5 },
     }}>
 
-      {!editMode &&
+      {!editMode && handleFavorite &&
         <IconButton
           sx={{
             position: 'absolute',
@@ -54,8 +54,9 @@ const ProductCard: React.FC<Props> = ({
             color: theme => theme.palette.primary.main
           }}
           onClick={handleFavorite}
+          disabled={favoriteLoading === id}
         >
-          {isFavorite ? <FavoriteRoundedIcon /> : <FavoriteBorderRoundedIcon />}
+          {favorite ? <FavoriteRoundedIcon /> : <FavoriteBorderRoundedIcon />}
         </IconButton>
       }
 
