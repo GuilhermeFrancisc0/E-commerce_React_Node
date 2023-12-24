@@ -8,6 +8,7 @@ export type User = {
     password: string;
     permissions: (keyof typeof Permissions)[];
     refreshToken?: string;
+    favoriteProducts?: mongoose.Types.ObjectId[];
 }
 
 const UserSchema = new mongoose.Schema<User>(
@@ -30,6 +31,7 @@ const UserSchema = new mongoose.Schema<User>(
             required: true
         }],
         refreshToken: String,
+        favoriteProducts: [mongoose.Types.ObjectId],
     },
     {
         toJSON: {
