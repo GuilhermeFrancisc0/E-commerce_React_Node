@@ -2,6 +2,9 @@ import { State } from '../../types/state';
 
 export type ProductsState = {
     list: ProductListResponse & State;
+    favorite: {
+        loadingId: string | null;
+    };
 }
 
 export type Product = {
