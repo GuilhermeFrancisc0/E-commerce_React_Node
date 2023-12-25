@@ -1,16 +1,29 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { ProductListParams, ProductListResponse } from '../Products/products.type';
-import { ProductFormValues, ProductsEditState } from './productsEdit.type';
+import {
+    ProductEditFiltersOptions, ProductFormValues, ProductsEditState
+} from './productsEdit.type';
 
 const initialState: ProductsEditState = {
     list: {
         loading: false,
+        success: false,
         products: [],
         total: 0,
         limit: 0,
         totalPages: 0,
         page: 0,
+    },
+    filters: {
+        options: {
+            price: undefined,
+            loading: false,
+        },
+        selecteds: {
+            price: undefined,
+            rating: undefined,
+        },
     },
     create: {
         loading: false,
@@ -32,18 +45,29 @@ const productsEditSlice = createSlice({
     reducers: {
         listRequest({ list }, { payload: { page } }: PayloadAction<ProductListParams>) {
             list.loading = true;
+            list.success = false;
             list.products = page ? [...list.products] : [];
         },
-        listSuccess({ list }, { payload }: PayloadAction<ProductListResponse>) {
-            list.loading = false;
-            list.products = [...list.products, ...payload.products];
-            list.page = payload.page;
-            list.limit = payload.limit;
-            list.total = payload.total;
-            list.totalPages = payload.totalPages;
+        listSuccess(state, { payload }: PayloadAction<ProductListResponse>) {
+            const { price, rating, ...listPayload } = payload;
+
+            state.list = {
+                ...state.list,
+                loading: false,
+                success: true,
+                ...listPayload,
+                products: [...state.list.products, ...listPayload.products]
+            }
+
+            state.filters.selecteds = {
+                ...state.filters.selecteds,
+                price,
+                rating
+            }
         },
         listFail({ list }) {
             list.loading = false;
+            list.success = false;
         },
 
         createRequest({ create }, _: PayloadAction<ProductFormValues>) {
@@ -86,6 +110,20 @@ const productsEditSlice = createSlice({
             remove.loading = false;
             remove.success = false;
         },
+
+        filtersOptionsRequest({ filters: { options } }) {
+            options.loading = true;
+        },
+        filtersOptionsSuccess({ filters }, { payload }: PayloadAction<ProductEditFiltersOptions>) {
+            filters.options = {
+                ...filters.options,
+                loading: false,
+                ...payload
+            }
+        },
+        filtersOptionsFail({ filters: { options } }) {
+            options.loading = false;
+        },
     }
 })
 
@@ -102,6 +140,9 @@ export const {
     removeRequest,
     removeSuccess,
     removeFail,
+    filtersOptionsRequest,
+    filtersOptionsSuccess,
+    filtersOptionsFail,
 } = productsEditSlice.actions;
 
 export default productsEditSlice.reducer;
