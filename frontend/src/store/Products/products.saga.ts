@@ -3,11 +3,14 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 
 import { PayloadAction } from '@reduxjs/toolkit';
 
-import { requestFavorites, requestList, requestToggleFavorite } from './products.service';
 import {
-    favoriteFail, favoriteRequest, favoriteSuccess, listFail, listRequest, listSuccess
+    requestFavorites, requestList, requestOptions, requestToggleFavorite
+} from './products.service';
+import {
+    favoriteFail, favoriteRequest, favoriteSuccess, filtersOptionsFail, filtersOptionsRequest,
+    filtersOptionsSuccess, listFail, listRequest, listSuccess
 } from './products.slice';
-import { ProductListParams, ProductListResponse } from './products.type';
+import { ProductFiltersOptions, ProductListParams, ProductListResponse } from './products.type';
 
 function* list({ payload: params }: PayloadAction<ProductListParams>) {
     try {
@@ -40,7 +43,18 @@ function* favorite({ payload }: PayloadAction<string>) {
     }
 }
 
+function* filtersOptions() {
+    try {
+        const { data }: AxiosResponse<ProductFiltersOptions> = yield call(requestOptions);
+
+        yield put(filtersOptionsSuccess(data));
+    } catch (e) {
+        yield put(filtersOptionsFail());
+    }
+}
+
 export default all([
     takeLatest(listRequest.type, list),
     takeLatest(favoriteRequest.type, favorite),
+    takeLatest(filtersOptionsRequest.type, filtersOptions),
 ]);

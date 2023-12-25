@@ -5,12 +5,13 @@ import { Grid } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import InfiniteScroll from '../../components/InfiniteScroll';
-import ProductCard from '../../components/ProductCard';
+import ProductCard from '../../components/Products/Card';
+import FiltersButton from '../../components/Products/FiltersButton';
 import { PAGINATION_LIMIT } from '../../constants';
 import { useAppSelector } from '../../hooks';
 import { useDisclose } from '../../hooks/util';
 import { Product } from '../../store/Products/products.type';
-import { listRequest } from '../../store/ProductsEdit/productsEdit.slice';
+import { filtersOptionsRequest, listRequest } from '../../store/ProductsEdit/productsEdit.slice';
 import ProductModal from './ProductModal';
 import RemoveModal from './RemoveModal';
 
@@ -20,7 +21,7 @@ const ProductsEdit: React.FC = () => {
   const [productToEdit, setProductToEdit] = React.useState<Product | null>(null);
   const [productIdToRemove, setProductIdToRemove] = React.useState<string | null>(null);
 
-  const { list: { loading, products, totalPages, page } } = useAppSelector(state => state.productsEdit);
+  const { list, filters } = useAppSelector(state => state.productsEdit);
 
   const productModal = useDisclose();
   const removeModal = useDisclose();
@@ -36,11 +37,12 @@ const ProductsEdit: React.FC = () => {
   }
 
   const nextPage = () => {
-    dispatch(listRequest({ page: page + 1, limit: PAGINATION_LIMIT }))
+    dispatch(listRequest({ page: list.page + 1, limit: PAGINATION_LIMIT, ...filters.selecteds }))
   };
 
   React.useEffect(() => {
-    dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT }));
+    dispatch(filtersOptionsRequest());
+    dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT, ...filters.selecteds }));
   }, []);
 
   React.useEffect(() => {
@@ -57,16 +59,24 @@ const ProductsEdit: React.FC = () => {
     <>
       <InfiniteScroll
         direction='down'
-        loading={loading}
-        isLastPage={page + 1 >= totalPages}
+        loading={list.loading}
+        isLastPage={list.page + 1 >= list.totalPages}
         nextPage={nextPage}
       >
         <Grid container spacing={2} p={2}>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <Button variant='contained' onClick={productModal.onOpen}>Cadastrar Novo Produto</Button>
           </Grid>
+          <Grid item display='flex' justifyContent='flex-end' xs={6}>
+            <FiltersButton
+              list={list}
+              filters={filters}
+              handleClearFilters={() => dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT }))}
+              handleSendFilters={form => dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT, ...form }))}
+            />
+          </Grid>
           <Grid item container spacing={2}>
-            {products.map(product => (
+            {list.products.map(product => (
               <Grid key={product.id} item xl={2} lg={3} md={4} sm={6} xs={12}>
                 <ProductCard
                   {...product}
