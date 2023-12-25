@@ -12,7 +12,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-import { Product } from '../../store/Products/products.type';
+import { Product } from '../../../store/Products/products.type';
 
 type Props = {
   editMode?: boolean;

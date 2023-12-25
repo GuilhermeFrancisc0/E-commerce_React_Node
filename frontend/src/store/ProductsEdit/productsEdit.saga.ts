@@ -4,14 +4,15 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 import { PAGINATION_LIMIT } from '../../constants';
-import { requestList } from '../Products/products.service';
+import { requestList, requestOptions } from '../Products/products.service';
 import { Product, ProductListParams, ProductListResponse } from '../Products/products.type';
 import { requestCreate, requestEdit, requestRemove } from './productsEdit.service';
 import {
-    createFail, createRequest, createSuccess, editFail, editRequest, editSuccess, listFail,
-    listRequest, listSuccess, removeFail, removeRequest, removeSuccess
+    createFail, createRequest, createSuccess, editFail, editRequest, editSuccess,
+    filtersOptionsFail, filtersOptionsRequest, filtersOptionsSuccess, listFail, listRequest,
+    listSuccess, removeFail, removeRequest, removeSuccess
 } from './productsEdit.slice';
-import { ProductFormValues } from './productsEdit.type';
+import { ProductEditFiltersOptions, ProductFormValues } from './productsEdit.type';
 
 function* list({ payload: params }: PayloadAction<ProductListParams>) {
     try {
@@ -55,9 +56,20 @@ function* remove({ payload }: PayloadAction<string>) {
     }
 }
 
+function* filtersOptions() {
+    try {
+        const { data }: AxiosResponse<ProductEditFiltersOptions> = yield call(requestOptions);
+
+        yield put(filtersOptionsSuccess(data));
+    } catch (e) {
+        yield put(filtersOptionsFail());
+    }
+}
+
 export default all([
     takeLatest(listRequest.type, list),
     takeLatest(createRequest.type, create),
     takeLatest(editRequest.type, edit),
     takeLatest(removeRequest.type, remove),
+    takeLatest(filtersOptionsRequest.type, filtersOptions),
 ]);
