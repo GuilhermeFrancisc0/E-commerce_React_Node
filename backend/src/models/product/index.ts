@@ -8,6 +8,23 @@ export type Product = {
     price: number;
 }
 
+export type ProductListReponse = {
+    products: Product[];
+    total: number;
+    limit: number;
+    totalPages: number;
+    page: number;
+} & ProductListFilters;
+
+export type ProductListFilters = {
+    price?: {
+        min: number;
+        max: number;
+    };
+    rating?: number,
+    favorite?: boolean;
+}
+
 const ProductSchema = new mongoose.Schema<Product>(
     {
         name: {
@@ -37,5 +54,8 @@ const ProductSchema = new mongoose.Schema<Product>(
         }
     }
 );
+
+// Search
+// ProductSchema.index({ name: 'text' });
 
 export const ProductModel = mongoose.model("products", ProductSchema);

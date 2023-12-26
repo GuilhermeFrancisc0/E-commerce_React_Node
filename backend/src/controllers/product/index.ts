@@ -1,33 +1,71 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 
-import { Product, ProductModel } from '../../models/product';
+import {
+    Product, ProductListFilters, ProductListReponse, ProductModel
+} from '../../models/product';
 import { UserModel } from '../../models/user';
 
 export const list = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 12, search = "" } = req.query;
+        const { page = 1, limit = 12, search, price, rating, favorite } = req.query;
 
-        const count = await ProductModel.countDocuments();
+        const { cookies } = req;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const foundUser = await UserModel.findById(cookies.loggedUserId);
+
+        const filters = { price, rating, favorite } as ProductListFilters;
+
+        const query: FilterQuery<ProductListFilters> = {};
+
+        if (filters.price)
+            query.price = { $gte: filters.price.min, $lte: filters.price.max };
+
+        if (filters.rating)
+            query.rating = { $gte: filters.rating };
+
+        if (filters.favorite && favorite === 'true')
+            query._id = { $in: foundUser?.favoriteProducts };
+
+        // if (search)
+        //  filter.$text = { $search: search };
+
+        const count = await ProductModel.countDocuments(query);
 
         const list = await ProductModel
-            .find(
-            // $text
-            // { name: { $regex: search, $options: "i" }, }
-        )
+            .find(query)
             .sort({ _id: -1 })
             .limit(Number(limit))
             .skip((Number(page)) * Number(limit))
-            .exec();
 
-        res.json({
+        const response: ProductListReponse = {
             products: list,
             total: count,
             limit: Number(limit),
             totalPages: Math.ceil(count / Number(limit)),
-            page: Number(page),
-        });
+            page: Number(page)
+        };
 
+        if (filters.price) {
+            response.price = {
+                min: Number(filters.price.min),
+                max: Number(filters.price.max),
+            };
+        }
+
+        if (filters.rating)
+            response.rating = Number(filters.rating);
+
+        if (filters.favorite && favorite === 'true')
+            response.favorite = true;
+
+        // if (search)
+        //     response.search = search;
+
+        res.json(response);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }
@@ -164,6 +202,24 @@ export const favorite = async (req: Request, res: Response) => {
         );
 
         res.json(updatedUser?.favoriteProducts);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const getOptions = async (_: Request, res: Response) => {
+    try {
+        const [{ _id, ...price }] = await ProductModel.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    min: { $min: '$price' },
+                    max: { $max: '$price' },
+                }
+            }
+        ]);
+
+        res.json({ price });
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }

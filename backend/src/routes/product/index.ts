@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {
-    create, favorite, get, getFavorites, list, remove, update
+    create, favorite, get, getFavorites, getOptions, list, remove, update
 } from '../../controllers/product';
 import { Permissions } from '../../enum/permissions';
 import { verifyPermissions } from '../../middlewares/auth';
@@ -9,6 +9,8 @@ import { verifyPermissions } from '../../middlewares/auth';
 const Routes = express.Router();
 
 Routes.get("/products", list);
+
+Routes.get("/products/options", getOptions);
 
 Routes.get("/products/favorite", getFavorites);
 Routes.put("/products/:id/favorite", favorite);
