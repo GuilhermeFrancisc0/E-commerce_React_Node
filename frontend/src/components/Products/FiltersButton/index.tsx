@@ -45,8 +45,10 @@ const FiltersButton: React.FC<Props> = ({
 
   const hasActiveFilter = React.useMemo(() => {
     const priceRangeHasChanged = selecteds.price?.min !== options.price?.min || selecteds.price?.max !== options.price?.max;
+    const favoriteChanged = ('favorite' in selecteds) && selecteds.favorite;
+    const ratingChanged = (selecteds.rating || 0) > 0;
 
-    return priceRangeHasChanged || (('favorite' in selecteds) && selecteds.favorite) || (selecteds.rating || 0) > 0;
+    return priceRangeHasChanged || favoriteChanged || ratingChanged;
   }, [selecteds, options]);
 
   React.useEffect(() => {
@@ -102,7 +104,11 @@ const FiltersButton: React.FC<Props> = ({
           {('favorite' in form) &&
             <Grid item xs={12}>
               <Typography color='primary'>Favoritos</Typography>
-              <Switch value={Boolean(form.favorite)} onChange={(_, v) => setForm({ ...form, favorite: v })} />
+              <Switch
+                checked={Boolean(form.favorite)}
+                value={Boolean(form.favorite)}
+                onChange={(_, v) => setForm({ ...form, favorite: v })}
+              />
             </Grid>
           }
           <Grid item xs={12}>
@@ -117,7 +123,7 @@ const FiltersButton: React.FC<Props> = ({
                 }
               }}
               valueLabelFormat={v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              value={[form.price?.min || 0, form.price?.max || 0]}
+              value={[form.price?.min || priceMarks[0].value, form.price?.max || priceMarks[1].value]}
               onChange={(_, v) => {
                 const range = v as number[];
                 setForm({ ...form, price: { min: range[0], max: range[1] } });

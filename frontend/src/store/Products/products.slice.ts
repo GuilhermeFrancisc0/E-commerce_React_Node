@@ -53,7 +53,7 @@ const productsSlice = createSlice({
             state.filters.selecteds = {
                 ...state.filters.selecteds,
                 favorite,
-                price,
+                price: price ? price : state.filters.options.price,
                 rating
             }
         },
@@ -84,7 +84,8 @@ const productsSlice = createSlice({
                 ...filters.options,
                 loading: false,
                 ...payload
-            }
+            };
+            filters.selecteds = { ...filters.selecteds, ...payload };
         },
         filtersOptionsFail({ filters: { options } }) {
             options.loading = false;
