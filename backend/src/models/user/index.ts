@@ -7,8 +7,13 @@ export type User = {
     username: string;
     password: string;
     permissions: (keyof typeof Permissions)[];
-    refreshToken?: string;
     favoriteProducts?: mongoose.Types.ObjectId[];
+}
+
+export type DecodedToken = {
+    email: string;
+    username: string;
+    permissions: (keyof typeof Permissions)[];
 }
 
 const UserSchema = new mongoose.Schema<User>(
@@ -30,7 +35,6 @@ const UserSchema = new mongoose.Schema<User>(
             enum: Permissions,
             required: true
         }],
-        refreshToken: String,
         favoriteProducts: [mongoose.Types.ObjectId],
     },
     {
