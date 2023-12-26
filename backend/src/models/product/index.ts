@@ -4,9 +4,8 @@ export type Product = {
     id?: string;
     name: string;
     imgSrc: string;
-    rating?: number;
+    rating: number;
     price: number;
-    favorite?: boolean;
 }
 
 const ProductSchema = new mongoose.Schema<Product>(
@@ -28,9 +27,6 @@ const ProductSchema = new mongoose.Schema<Product>(
             type: Number,
             min: 0,
         },
-        favorite: {
-            type: Boolean,
-        }
     },
     {
         toJSON: {
