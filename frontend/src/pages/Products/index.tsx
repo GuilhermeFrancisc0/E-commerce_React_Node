@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Grid } from '@mui/material';
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
+import { Grid, Typography } from '@mui/material';
 
 import InfiniteScroll from '../../components/InfiniteScroll';
 import ProductCard from '../../components/Products/Card';
@@ -46,15 +47,38 @@ const Products: React.FC = () => {
             handleSendFilters={form => dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT, ...form }))}
           />
         </Grid>
-        {list.products.map(product => (
-          <Grid key={product.name} item xl={2} lg={3} md={4} sm={6} xs={12}>
-            <ProductCard
-              {...product}
-              favoriteLoading={favorite.loadingId}
-              handleFavorite={() => handleFavorite(product.id)}
-            />
-          </Grid>
-        ))}
+        {list.products.length ?
+          <>
+            {list.products.map(product => (
+              <Grid key={product.name} item xl={2} lg={3} md={4} sm={6} xs={12}>
+                <ProductCard
+                  {...product}
+                  favoriteLoading={favorite.loadingId}
+                  handleFavorite={() => handleFavorite(product.id)}
+                />
+              </Grid>
+            ))}
+          </>
+          :
+          <>
+            {
+              !list.loading &&
+              <Grid
+                xs={12}
+                height='70vh'
+                display='flex'
+                alignItems='center'
+                justifyContent='center'
+                flexDirection='column'
+              >
+                <ProductionQuantityLimitsIcon sx={{ fontSize: 130, color: theme => theme.palette.primary.light }} />
+                <Typography fontSize={30} sx={{ color: theme => theme.palette.primary.light }}>
+                  Nenhum Produto Encontrado
+                </Typography>
+              </Grid>
+            }
+          </>
+        }
       </Grid>
     </InfiniteScroll>
   );
