@@ -1,7 +1,8 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Grid } from '@mui/material';
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
+import { Grid, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import InfiniteScroll from '../../components/InfiniteScroll';
@@ -75,18 +76,39 @@ const ProductsEdit: React.FC = () => {
               handleSendFilters={form => dispatch(listRequest({ page: 0, limit: PAGINATION_LIMIT, ...form }))}
             />
           </Grid>
-          <Grid item container spacing={2}>
-            {list.products.map(product => (
-              <Grid key={product.id} item xl={2} lg={3} md={4} sm={6} xs={12}>
-                <ProductCard
-                  {...product}
-                  editMode
-                  handleEdit={() => handleEdit(product)}
-                  handleRemove={() => handleRemove(product.id || '')}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          {list.products.length ?
+            <>
+              {list.products.map(product => (
+                <Grid key={product.id} item xl={2} lg={3} md={4} sm={6} xs={12}>
+                  <ProductCard
+                    {...product}
+                    editMode
+                    handleEdit={() => handleEdit(product)}
+                    handleRemove={() => handleRemove(product.id || '')}
+                  />
+                </Grid>
+              ))}
+            </>
+            :
+            <>
+              {
+                !list.loading &&
+                <Grid
+                  xs={12}
+                  height='70vh'
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='center'
+                  flexDirection='column'
+                >
+                  <ProductionQuantityLimitsIcon sx={{ fontSize: 130, color: theme => theme.palette.primary.light }} />
+                  <Typography fontSize={30} sx={{ color: theme => theme.palette.primary.light }}>
+                    Nenhum Produto Encontrado
+                  </Typography>
+                </Grid>
+              }
+            </>
+          }
         </Grid>
       </InfiniteScroll>
 
