@@ -8,6 +8,7 @@ import ProductCard from '../../components/Products/Card';
 import FiltersButton from '../../components/Products/FiltersButton';
 import { PAGINATION_LIMIT } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import { addRequest } from '../../store/Cart/cart.slice';
 import {
   favoriteRequest, filtersOptionsRequest, listRequest
 } from '../../store/Products/products.slice';
@@ -16,14 +17,18 @@ const Products: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const { list, favorite, filters } = useAppSelector(state => state.products);
+  const { add: { loadingId: addToCartLoading } } = useAppSelector(state => state.cart);
 
   const nextPage = () => {
     dispatch(listRequest({ page: list.page + 1, limit: PAGINATION_LIMIT, ...filters.selecteds }))
   }
 
-  const handleFavorite = (productId: string | undefined) => {
-    if (productId)
-      dispatch(favoriteRequest(productId));
+  const handleFavorite = (productId: string) => {
+    dispatch(favoriteRequest(productId));
+  }
+
+  const handleAddToCart = (productId: string) => {
+    dispatch(addRequest(productId));
   }
 
   React.useEffect(() => {
@@ -54,7 +59,9 @@ const Products: React.FC = () => {
                 <ProductCard
                   {...product}
                   favoriteLoading={favorite.loadingId}
-                  handleFavorite={() => handleFavorite(product.id)}
+                  cartLoading={addToCartLoading}
+                  handleFavorite={() => handleFavorite(product.id as string)}
+                  handleAddToCart={() => handleAddToCart(product.id as string)}
                 />
               </Grid>
             ))}
@@ -64,6 +71,7 @@ const Products: React.FC = () => {
             {
               !list.loading &&
               <Grid
+                item
                 xs={12}
                 height='70vh'
                 display='flex'
