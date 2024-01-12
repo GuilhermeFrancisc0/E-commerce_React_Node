@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import { configureStore } from '@reduxjs/toolkit';
 
 import authSlice from './Auth/auth.slice';
+import cartSlice from './Cart/cart.slice';
 import productsSlice from './Products/products.slice';
 import productsEditSlice from './ProductsEdit/productsEdit.slice';
 import rootSaga from './rootSaga';
@@ -14,6 +15,7 @@ export const store = configureStore({
         auth: authSlice,
         products: productsSlice,
         productsEdit: productsEditSlice,
+        cart: cartSlice,
     },
     middleware: getDefaultMiddleware =>
         getDefaultMiddleware({
