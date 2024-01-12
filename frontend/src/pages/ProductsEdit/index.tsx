@@ -94,6 +94,7 @@ const ProductsEdit: React.FC = () => {
               {
                 !list.loading &&
                 <Grid
+                  item
                   xs={12}
                   height='70vh'
                   display='flex'

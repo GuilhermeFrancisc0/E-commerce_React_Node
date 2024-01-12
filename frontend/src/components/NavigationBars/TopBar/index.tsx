@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, Grid, Menu, MenuItem, Tooltip } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { Avatar, Badge, Drawer, Grid, Menu, MenuItem, Tooltip } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -10,7 +11,9 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { useDisclose } from '../../../hooks/util';
 import Auth from '../../../pages/Auth';
+import Cart from '../../../pages/Cart';
 import { signOutRequest, userInfoRequest } from '../../../store/Auth/auth.slice';
+import { listRequest } from '../../../store/Cart/cart.slice';
 
 type Props = {
   toggleSidebar: () => void;
@@ -22,14 +25,11 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
   const dispatch = useAppDispatch();
 
   const { userInfo } = useAppSelector(state => state.auth);
-
-  React.useEffect(() => {
-    if (localStorage.getItem('accessToken'))
-      dispatch(userInfoRequest());
-  }, []);
+  const { products } = useAppSelector(state => state.cart);
 
   const menu = useDisclose();
   const signInModal = useDisclose();
+  const cartDrawer = useDisclose();
 
   const iconButtonRef = React.useRef(null);
 
@@ -37,6 +37,16 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
     menu.onClose();
     dispatch(signOutRequest());
   }
+
+  React.useEffect(() => {
+    if (localStorage.getItem('accessToken'))
+      dispatch(userInfoRequest());
+  }, []);
+
+  React.useEffect(() => {
+    if (userInfo.permissions.includes('CLIENT'))
+      dispatch(listRequest());
+  }, [userInfo]);
 
   return (
     <>
@@ -62,6 +72,14 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
           </Grid>
 
           <Grid item display='flex' alignItems='center'>
+            {userInfo.permissions.includes('CLIENT') &&
+              <IconButton sx={{ p: 1.5 }} onClick={cartDrawer.onOpen}>
+                <Badge color="error" badgeContent={products.length}>
+                  <ShoppingCartIcon color='secondary'></ShoppingCartIcon>
+                </Badge>
+              </IconButton>
+            }
+
             {!userInfo.username ?
               <Button color="inherit" onClick={signInModal.onOpen}>Login</Button>
               :
@@ -99,6 +117,14 @@ const TopBar: React.FC<Props> = ({ toggleSidebar }) => {
       </AppBar>
 
       <Auth signInModal={signInModal} />
+
+      <Drawer
+        anchor='right'
+        open={cartDrawer.isOpen}
+        onClose={cartDrawer.onClose}
+      >
+        <Cart />
+      </Drawer>
     </>
   );
 }

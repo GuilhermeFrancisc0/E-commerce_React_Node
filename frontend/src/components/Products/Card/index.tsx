@@ -19,7 +19,9 @@ type Props = {
   handleEdit?: () => void;
   handleRemove?: () => void;
   handleFavorite?: () => void;
+  handleAddToCart?: () => void;
   favoriteLoading?: string | null;
+  cartLoading?: string | null;
 } & Product;
 
 const ProductCard: React.FC<Props> = ({
@@ -33,7 +35,9 @@ const ProductCard: React.FC<Props> = ({
   handleEdit,
   handleRemove,
   handleFavorite,
+  handleAddToCart,
   favoriteLoading,
+  cartLoading,
 }) => {
 
   return (
@@ -117,6 +121,8 @@ const ProductCard: React.FC<Props> = ({
             variant='contained'
             size="small"
             endIcon={<AddShoppingCartRoundedIcon />}
+            onClick={handleAddToCart}
+            disabled={cartLoading === id}
           >
             Adicionar
           </Button>}
