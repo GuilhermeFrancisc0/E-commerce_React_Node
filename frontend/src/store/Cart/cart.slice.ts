@@ -45,12 +45,12 @@ const cartSlice = createSlice({
             add.loadingId = null;
         },
 
-        removeRequest({ remove }, _: PayloadAction<string>) {
+        removeRequest({ remove }, _: PayloadAction<number>) {
             remove.loading = true;
         },
-        removeSuccess(state, { payload }: PayloadAction<string>) {
+        removeSuccess(state, { payload }: PayloadAction<Product[]>) {
             state.remove.loading = false;
-            state.products = [...state.products.filter(p => p.id !== payload)];
+            state.products = payload;
         },
         removeFail({ remove }) {
             remove.loading = false;

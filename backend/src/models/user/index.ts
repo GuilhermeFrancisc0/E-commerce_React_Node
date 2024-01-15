@@ -8,6 +8,7 @@ export type User = {
     password: string;
     permissions: (keyof typeof Permissions)[];
     favoriteProducts?: mongoose.Types.ObjectId[];
+    cartProducts?: mongoose.Types.ObjectId[];
 }
 
 export type DecodedToken = {
@@ -36,6 +37,7 @@ const UserSchema = new mongoose.Schema<User>(
             required: true
         }],
         favoriteProducts: [mongoose.Types.ObjectId],
+        cartProducts: [mongoose.Types.ObjectId],
     },
     {
         toJSON: {
