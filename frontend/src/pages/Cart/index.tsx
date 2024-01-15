@@ -14,8 +14,8 @@ const Cart: React.FC = () => {
 
   const { products, list } = useAppSelector(state => state.cart);
 
-  const removeFromCart = (productId: string) => {
-    dispatch(removeRequest(productId));
+  const removeFromCart = (productIdx: number) => {
+    dispatch(removeRequest(productIdx));
   }
 
   const finalizePurchase = () => {
@@ -35,12 +35,11 @@ const Cart: React.FC = () => {
         </Typography>
       </Box>
 
-      <Grid container overflow='auto' height='80%'>
-
+      <Box overflow='auto' height='80%'>
         {products.length ?
           <>
-            {products.map(product => (
-              <Grid key={product.name} item xs={12} paddingBottom={2}>
+            {products.map((product, i) => (
+              <Box key={product.name + '_' + i} paddingBottom={2}>
                 <Card sx={{
                   position: 'relative',
                   transition: 'box-shadow .5s',
@@ -53,7 +52,7 @@ const Cart: React.FC = () => {
                       right: 0,
                       color: theme => theme.palette.primary.main,
                     }}
-                    onClick={() => removeFromCart(product.id as string)}
+                    onClick={() => removeFromCart(i)}
                   >
                     <CloseIcon fontSize='small' />
                   </IconButton>
@@ -82,16 +81,15 @@ const Cart: React.FC = () => {
                     </Grid>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
           </>
           :
           <>
             {
               !list.loading &&
-              <Grid
-                item
-                xs={12}
+              <Box
+                height='100%'
                 width='100%'
                 display='flex'
                 alignItems='center'
@@ -102,11 +100,11 @@ const Cart: React.FC = () => {
                 <Typography textAlign='center' fontSize={20} sx={{ color: theme => theme.palette.primary.light }}>
                   Nenhum Produto Adicionado
                 </Typography>
-              </Grid>
+              </Box>
             }
           </>
         }
-      </Grid>
+      </Box>
 
       <Box height='10%'>
         {!!products.length &&

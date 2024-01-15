@@ -30,11 +30,11 @@ function* add({ payload }: PayloadAction<string>) {
     }
 }
 
-function* remove({ payload }: PayloadAction<string>) {
+function* remove({ payload }: PayloadAction<number>) {
     try {
-        yield call(requestRemove, payload);
+        const { data }: AxiosResponse<Product[]> = yield call(requestRemove, payload);
 
-        yield put(removeSuccess(payload));
+        yield put(removeSuccess(data));
     } catch (e) {
         yield put(removeFail());
     }

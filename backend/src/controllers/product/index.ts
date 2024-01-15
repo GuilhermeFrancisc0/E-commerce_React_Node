@@ -159,6 +159,8 @@ export const update = async (req: Request, res: Response) => {
     }
 }
 
+// Favorite
+
 export const getFavorites = async (req: Request, res: Response) => {
     try {
         const { cookies } = req;
@@ -220,6 +222,108 @@ export const getOptions = async (_: Request, res: Response) => {
         ]);
 
         res.json({ price });
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+// Cart
+
+export const getCart = async (req: Request, res: Response) => {
+    try {
+        const { cookies } = req;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const foundUser = await UserModel.findById(cookies.loggedUserId);
+
+        if (!foundUser)
+            throw new Error('Usuário não Encontrado!');
+
+        const list = await ProductModel.find({ _id: { $in: foundUser?.cartProducts } });
+
+        const cart = foundUser?.cartProducts?.map(cartProdId => list.find(l => cartProdId.equals(l.id)));
+
+        res.json(cart);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const addCart = async (req: Request, res: Response) => {
+    try {
+        const { params: { id }, cookies } = req;
+
+        const productId = id as any as mongoose.Types.ObjectId;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            cookies.loggedUserId,
+            { $push: { cartProducts: productId } },
+            { new: true }
+        );
+
+        const list = await ProductModel.find({ _id: { $in: updatedUser?.cartProducts } });
+
+        const cart = updatedUser?.cartProducts?.map(cartProdId => list.find(l => cartProdId.equals(l.id)));
+
+        res.json(cart);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const removeCart = async (req: Request, res: Response) => {
+    try {
+        const { params: { idx }, cookies } = req;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            cookies.loggedUserId,
+            [
+                {
+                    $set: {
+                        cartProducts: {
+                            $concatArrays: [
+                                { $slice: ["$cartProducts", Number(idx)] },
+                                { $slice: ["$cartProducts", { $add: [1,  Number(idx)] }, { $size: "$cartProducts" }] }
+                            ]
+                        }
+                    }
+                }
+            ],
+            { new: true }
+        );
+
+        const list = await ProductModel.find({ _id: { $in: updatedUser?.cartProducts } });
+
+        const cart = updatedUser?.cartProducts?.map(cartProdId => list.find(l => cartProdId.equals(l.id)));
+
+        res.json(cart);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const finalizeCart = async (req: Request, res: Response) => {
+    try {
+        const { cookies } = req;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            cookies.loggedUserId,
+            { cartProducts: [] },
+            { new: true }
+        );
+
+        res.json(updatedUser?.cartProducts);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }
