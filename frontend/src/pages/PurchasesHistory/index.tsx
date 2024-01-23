@@ -55,7 +55,7 @@ const PurchasesHistory: React.FC = () => {
                       {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </TableCell>
                     <TableCell align='center'>
-                      {new Date().toLocaleString("pt-br")}
+                      {new Date(product.purchaseDate).toLocaleString("pt-br")}
                     </TableCell>
                   </TableRow>
                 ))}
