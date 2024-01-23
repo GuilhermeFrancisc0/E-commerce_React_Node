@@ -291,7 +291,7 @@ export const removeCart = async (req: Request, res: Response) => {
                         cartProducts: {
                             $concatArrays: [
                                 { $slice: ["$cartProducts", Number(idx)] },
-                                { $slice: ["$cartProducts", { $add: [1,  Number(idx)] }, { $size: "$cartProducts" }] }
+                                { $slice: ["$cartProducts", { $add: [1, Number(idx)] }, { $size: "$cartProducts" }] }
                             ]
                         }
                     }
@@ -317,13 +317,56 @@ export const finalizeCart = async (req: Request, res: Response) => {
         if (!cookies.loggedUserId)
             throw new Error('Cookie loggedUserId não Encontrado!');
 
+        const foundUser = await UserModel.findById(cookies.loggedUserId);
+
+        if (!foundUser?.cartProducts)
+            throw new Error('Carrinho vazio!');
+
+        const cartProducts = foundUser?.cartProducts.map(pId => {
+            return { id: pId, purchaseDate: Date.now() }
+        });
+
+        const purchasesHistory = [...cartProducts, ...(foundUser?.purchasesHistory || [])];
+
         const updatedUser = await UserModel.findByIdAndUpdate(
             cookies.loggedUserId,
-            { cartProducts: [] },
+            {
+                cartProducts: [],
+                purchasesHistory
+            },
             { new: true }
         );
 
         res.json(updatedUser?.cartProducts);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const getPurchasesHistory = async (req: Request, res: Response) => {
+    try {
+        const { cookies } = req;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const foundUser = await UserModel.findById(cookies.loggedUserId);
+
+        if (!foundUser)
+            throw new Error('Usuário não Encontrado!');
+
+        const list = await ProductModel.find({ _id: { $in: foundUser?.purchasesHistory?.map(p => p.id) } });
+
+        const purchasesHistory = foundUser?.purchasesHistory?.map(p => {
+            const product = list.find(l => p.id.equals(l.id))?.toObject();
+
+            return {
+                ...product,
+                purchaseDate: p.purchaseDate
+            }
+        });
+
+        res.json(purchasesHistory);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }

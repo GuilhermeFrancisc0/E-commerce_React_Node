@@ -1,8 +1,8 @@
 import express from 'express';
 
 import {
-    addCart, create, favorite, finalizeCart, get, getCart, getFavorites, getOptions, list, remove,
-    removeCart, update
+    addCart, create, favorite, finalizeCart, get, getCart, getFavorites, getOptions,
+    getPurchasesHistory, list, remove, removeCart, update
 } from '../../controllers/product';
 import { Permissions } from '../../enum/permissions';
 import { verifyPermissions } from '../../middlewares/auth';
@@ -15,9 +15,12 @@ Routes.get(BASE_URL, list);
 
 Routes.get(`${BASE_URL}/options`, getOptions);
 
+// Purchase History
+Routes.get(`${BASE_URL}/purchasesHistory`, verifyPermissions([Permissions.CLIENT]), getPurchasesHistory);
+
 // Favorite
-Routes.get(`${BASE_URL}/favorite`, getFavorites);
-Routes.put(`${BASE_URL}/:id/favorite`, favorite);
+Routes.get(`${BASE_URL}/favorite`, verifyPermissions([Permissions.CLIENT]), getFavorites);
+Routes.put(`${BASE_URL}/:id/favorite`, verifyPermissions([Permissions.CLIENT]), favorite);
 
 // Cart
 Routes.get(`${BASE_URL}/cart`, verifyPermissions([Permissions.CLIENT]), getCart);

@@ -9,6 +9,7 @@ export type User = {
     permissions: (keyof typeof Permissions)[];
     favoriteProducts?: mongoose.Types.ObjectId[];
     cartProducts?: mongoose.Types.ObjectId[];
+    purchasesHistory?: { id: mongoose.Types.ObjectId, purchaseDate: Date }[];
 }
 
 export type DecodedToken = {
@@ -38,6 +39,10 @@ const UserSchema = new mongoose.Schema<User>(
         }],
         favoriteProducts: [mongoose.Types.ObjectId],
         cartProducts: [mongoose.Types.ObjectId],
+        purchasesHistory: [{
+            id: mongoose.Types.ObjectId,
+            purchaseDate: Date,
+        }],
     },
     {
         toJSON: {
