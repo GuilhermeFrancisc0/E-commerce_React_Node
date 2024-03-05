@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import { Box, CardMedia, IconButton, Rating } from '@mui/material';
+import { Box, CardMedia, IconButton, Rating, Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -20,6 +20,7 @@ type Props = {
   handleRemove?: () => void;
   handleFavorite?: () => void;
   handleAddToCart?: () => void;
+  handleEvaluate?: () => void;
   favoriteLoading?: string | null;
   cartLoading?: string | null;
 } & Product;
@@ -28,7 +29,7 @@ const ProductCard: React.FC<Props> = ({
   id,
   name,
   imgSrc,
-  rating,
+  evaluations,
   price,
   favorite,
   editMode,
@@ -36,6 +37,7 @@ const ProductCard: React.FC<Props> = ({
   handleRemove,
   handleFavorite,
   handleAddToCart,
+  handleEvaluate,
   favoriteLoading,
   cartLoading,
 }) => {
@@ -85,7 +87,16 @@ const ProductCard: React.FC<Props> = ({
           {name}
         </Typography>
 
-        <Rating name="size-medium" defaultValue={rating} readOnly />
+        <Tooltip title={handleEvaluate ? "Clique para avaliar o produto" : ""}>
+          <Box 
+           sx={{ cursor: handleEvaluate ? 'pointer' : 'default'}}
+           display='flex'
+           onClick={handleEvaluate}
+           >
+            <Rating defaultValue={evaluations?.reduce((acc, curr) => acc + curr.rating, 0)} readOnly />
+            ({evaluations?.length})
+          </Box>
+        </Tooltip>
 
         <Typography gutterBottom variant="h5" component="div">
           {price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}

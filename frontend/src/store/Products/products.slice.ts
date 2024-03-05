@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import {
+    ProductEvaluation,
+    ProductEvaluationPayload,
     ProductFiltersOptions, ProductListParams, ProductListResponse, ProductsState
 } from './products.type';
 
@@ -27,6 +29,10 @@ const initialState: ProductsState = {
     },
     favorite: {
         loadingId: null,
+    },
+    sendEvaluation: {
+        loading: false,
+        success: false,
     }
 }
 
@@ -90,6 +96,19 @@ const productsSlice = createSlice({
         filtersOptionsFail({ filters: { options } }) {
             options.loading = false;
         },
+
+        sendEvaluationRequest({ sendEvaluation }, _: PayloadAction<ProductEvaluationPayload>) {
+            sendEvaluation.loading = true;
+            sendEvaluation.success = false;
+        },
+        sendEvaluationSuccess({ sendEvaluation }, _: PayloadAction<ProductEvaluation[]>) {
+            sendEvaluation.loading = false;
+            sendEvaluation.success = true;
+        },
+        sendEvaluationFail({ sendEvaluation }) {
+            sendEvaluation.loading = false;
+            sendEvaluation.success = false;
+        },
     }
 })
 
@@ -103,6 +122,9 @@ export const {
     filtersOptionsRequest,
     filtersOptionsSuccess,
     filtersOptionsFail,
+    sendEvaluationRequest,
+    sendEvaluationSuccess,
+    sendEvaluationFail,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

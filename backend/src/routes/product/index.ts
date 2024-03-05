@@ -1,8 +1,8 @@
 import express from 'express';
 
 import {
-    addCart, create, favorite, finalizeCart, get, getCart, getFavorites, getOptions,
-    getPurchasesHistory, list, remove, removeCart, update
+    addCart, create, evaluateProduct, favorite, finalizeCart, get, getCart, getFavorites,
+    getOptions, getPurchasesHistory, list, remove, removeCart, update
 } from '../../controllers/product';
 import { Permissions } from '../../enum/permissions';
 import { verifyPermissions } from '../../middlewares/auth';
@@ -14,6 +14,9 @@ const Routes = express.Router();
 Routes.get(BASE_URL, list);
 
 Routes.get(`${BASE_URL}/options`, getOptions);
+
+// Evaluation
+Routes.post(`${BASE_URL}/evaluation/:id`, verifyPermissions([Permissions.CLIENT]), evaluateProduct);
 
 // Purchase History
 Routes.get(`${BASE_URL}/purchasesHistory`, verifyPermissions([Permissions.CLIENT]), getPurchasesHistory);

@@ -1,11 +1,25 @@
 import mongoose from 'mongoose';
 
+export type EvaluationPayload = {
+    rating: number;
+    comment: string;
+}
+
+export type Evaluation = {
+    userId: mongoose.Types.ObjectId;
+    username: string;
+    rating: number;
+    comment: string;
+    createdAt: Date;
+}
+
 export type Product = {
     id?: string;
     name: string;
     imgSrc: string;
     rating: number;
     price: number;
+    evaluations?: Evaluation;
 }
 
 export type ProductListReponse = {
@@ -44,6 +58,13 @@ const ProductSchema = new mongoose.Schema<Product>(
             type: Number,
             min: 0,
         },
+        evaluations: [{
+            userId: mongoose.Types.ObjectId,
+            username: String,
+            rating: Number,
+            comment: String,
+            createdAt: Date,
+        }],
     },
     {
         toJSON: {

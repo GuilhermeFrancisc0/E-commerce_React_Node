@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import mongoose, { FilterQuery } from 'mongoose';
 
 import {
-    Product, ProductListFilters, ProductListReponse, ProductModel
+    Evaluation, EvaluationPayload, Product, ProductListFilters, ProductListReponse, ProductModel
 } from '../../models/product';
 import { UserModel } from '../../models/user';
 
@@ -367,6 +367,47 @@ export const getPurchasesHistory = async (req: Request, res: Response) => {
         });
 
         res.json(purchasesHistory);
+    } catch (e: any | Error) {
+        res.status(400).send({ message: e.message });
+    }
+}
+
+export const evaluateProduct = async (req: Request, res: Response) => {
+    try {
+        const { params: { id }, cookies, body } = req;
+
+        const productId = id as any as mongoose.Types.ObjectId;
+
+        const evaluationBody = body as EvaluationPayload;
+
+        if (!cookies.loggedUserId)
+            throw new Error('Cookie loggedUserId não Encontrado!');
+
+        const foundUser = await UserModel.findById(cookies.loggedUserId);
+
+        if (!foundUser)
+            throw new Error('Usuário não Encontrado!');
+
+        if(!foundUser.purchasesHistory?.some(ph => ph.id.equals(productId)))
+            throw new Error('Só podem ser avaliados produtos já comprados!');
+
+        if (!Number.isInteger(evaluationBody.rating))
+            throw new Error('Avaliação sem nota!');
+
+        const evaluation: Evaluation = {
+            ...evaluationBody,
+            createdAt: new Date(),
+            userId: foundUser.id,
+            username: foundUser.username,
+        }
+
+        const product = await ProductModel.findByIdAndUpdate(
+            productId,
+            { $push: { evaluations: evaluation } },
+            { new: true }
+        );
+
+        res.json(product?.evaluations);
     } catch (e: any | Error) {
         res.status(400).send({ message: e.message });
     }

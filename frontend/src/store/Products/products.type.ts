@@ -9,6 +9,7 @@ export type ProductsState = {
     favorite: {
         loadingId: string | null;
     };
+    sendEvaluation: State;
 }
 
 export type Product = {
@@ -18,6 +19,7 @@ export type Product = {
     rating?: number;
     price: number;
     favorite?: boolean;
+    evaluations?: ProductEvaluation[];
 }
 
 // List
@@ -47,4 +49,20 @@ export type ProductFiltersOptions = {
         min: number;
         max: number;
     }
+}
+
+// Evaluation
+
+export type ProductEvaluationPayload = {
+    productId: string;
+    rating: number | null;
+    comment: string;
+}
+
+export type ProductEvaluation = {
+    userId: string;
+    username: string;
+    rating: number;
+    comment: string;
+    createdAt: Date;
 }
