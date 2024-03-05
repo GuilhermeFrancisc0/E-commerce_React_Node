@@ -4,13 +4,17 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 import {
-    requestFavorites, requestList, requestOptions, requestToggleFavorite
+    requestFavorites, requestList, requestOptions, requestSendEvaluation, requestToggleFavorite
 } from './products.service';
 import {
     favoriteFail, favoriteRequest, favoriteSuccess, filtersOptionsFail, filtersOptionsRequest,
-    filtersOptionsSuccess, listFail, listRequest, listSuccess
+    filtersOptionsSuccess, listFail, listRequest, listSuccess, sendEvaluationFail,
+    sendEvaluationRequest, sendEvaluationSuccess
 } from './products.slice';
-import { ProductFiltersOptions, ProductListParams, ProductListResponse } from './products.type';
+import {
+    ProductEvaluation, ProductEvaluationPayload, ProductFiltersOptions, ProductListParams,
+    ProductListResponse
+} from './products.type';
 
 function* list({ payload: params }: PayloadAction<ProductListParams>) {
     try {
@@ -53,8 +57,19 @@ function* filtersOptions() {
     }
 }
 
+function* sendEvaluation({ payload }: PayloadAction<ProductEvaluationPayload>) {
+    try {
+        const { data }: AxiosResponse<ProductEvaluation[]> = yield call(requestSendEvaluation, payload);
+
+        yield put(sendEvaluationSuccess(data));
+    } catch (e) {
+        yield put(sendEvaluationFail());
+    }
+}
+
 export default all([
     takeLatest(listRequest.type, list),
     takeLatest(favoriteRequest.type, favorite),
     takeLatest(filtersOptionsRequest.type, filtersOptions),
+    takeLatest(sendEvaluationRequest.type, sendEvaluation),
 ]);

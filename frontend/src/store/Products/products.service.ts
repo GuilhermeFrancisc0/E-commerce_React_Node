@@ -1,5 +1,8 @@
 import api from '../../services/api';
-import { ProductFiltersOptions, ProductListParams, ProductListResponse } from './products.type';
+import {
+    ProductEvaluation, ProductEvaluationPayload, ProductFiltersOptions, ProductListParams,
+    ProductListResponse
+} from './products.type';
 
 export const requestList = (params: ProductListParams) =>
     api.get<ProductListResponse>('/products', { params });
@@ -12,3 +15,6 @@ export const requestFavorites = () =>
 
 export const requestToggleFavorite = (id: string) =>
     api.put<string[]>(`/products/${id}/favorite`);
+
+export const requestSendEvaluation = ({ productId, ...payload }: ProductEvaluationPayload) =>
+    api.post<ProductEvaluation[]>(`/products/evaluation/${productId}`, payload);
